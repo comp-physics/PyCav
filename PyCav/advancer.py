@@ -7,22 +7,13 @@ class time_advancer:
     def __init__(self, 
         method="Euler",
         time_step=0.,
-        final_time=0.,
-        NR0=1,
-        bub_config=None
+        final_time=0.
         ):
 
         self.method = method
         self.time_step = time_step
         self.final_time = final_time
-        self.num_R0_nodes = NR0
 
-        self.bubble = bub.bubble_model()
-
-        self.num_RV_dim = self.bubble.num_RV_dim
-        self.num_dim = self.num_R0_nodes + self.num_RV_dim
-
-        self.state = np.zeros(self.num_dim)
         self.rhs = np.zeros(self.num_dim)
 
         if self.method == "Euler":
@@ -69,6 +60,3 @@ class time_advancer:
 if __name__ == "__main__":
 
     adv = time_advancer()
-
-    rhs = adv.bubble.rhs(p=2.0)
-    print('rhs = ',rhs)

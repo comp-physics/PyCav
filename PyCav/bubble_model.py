@@ -1,3 +1,5 @@
+import numpy as np
+
 class bubble_model:
 
     def __init__(self,
@@ -51,6 +53,10 @@ class bubble_model:
         else:
             raise NotImplementedError
         return rhs
+    
+    def state(self):
+        if self.model == "RPE":
+            return np.array([ self.R, self.V ])
 
 if __name__ == "__main__":
 
