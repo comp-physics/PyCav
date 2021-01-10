@@ -34,6 +34,8 @@ class state:
         for i in range(self.NR0):
             self.vals[i,:] = self.bubble[i].state()
 
+        self.rhs = np.zeros((self.NR0,self.num_RV_dim))
+
     def init_simp(self):
         raise NotImplementedError
 
@@ -42,9 +44,19 @@ class state:
         self.R0 = np.ones(1)
         self.bubble = [ bub.bubble_model(model=self.model,R0=1) ]
 
+    def get_rhs(self,p):
+        for i in range(self.NR0):
+            self.rhs[i,:] = self.bubble[i].rhs(p)
 
 if __name__ == "__main__":
 
     stat = state()
     val = stat.vals
-    print('state = ',val)
+    print('state 0 = ',val)
+    p = 1.1
+    dt = 0.1
+    stat.get_rhs(p)
+    val += dt * stat.rhs
+    
+    print('rhs = ',stat.rhs)
+    print('state 1 = ',val)

@@ -44,7 +44,7 @@ class bubble_model:
         rhs = -1.5*self.V**2.0 + (self.cpbw - p)/self.R
         if self.viscosity:
             rhs -= 4.0*self.Re_inv*self.V/(self.R**2.0)
-        return rhs
+        return [self.V, rhs]
 
     def rhs(self,p):
         self.pbw()
