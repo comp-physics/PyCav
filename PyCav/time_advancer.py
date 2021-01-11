@@ -4,7 +4,7 @@ import numpy as np
 
 class time_advancer:
 
-    def __init__(self,config=None):
+    def __init__(self,config={}):
 
         self.method = config["method"]
         self.dt = config["dt"]
@@ -24,22 +24,14 @@ class time_advancer:
 
         return
 
-    def initialize_state(self,config=None):
-
-        model = config["model"]
-        NR0 = config["NR0"]
-        shape = config["shape"]
-        binning = config["binning"]
-        sigR0 = config["sigR0"]
+    def initialize_state(self,
+            state_config=None,
+            model_config=None):
 
         self.state = bs.bubble_state(
-                model=model,
-                NR0=NR0,
-                shape=shape,
-                binning=binning,
-                sigR0=sigR0)
+                state_config=state_config,
+                model_config=model_config)
 
-        return
 
     def euler(self):
 
@@ -57,21 +49,15 @@ class time_advancer:
         return
 
     def run(self):
-
         self.time = 0.0
-
         i_step = 0
         step = True
         while step == True:
-
             self.advance()
-
             i_step += 1
             self.time += self.dt
-
             if self.time > self.T:
                 step = False
-
         return
 
 if __name__ == "__main__":

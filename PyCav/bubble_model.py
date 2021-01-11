@@ -3,36 +3,59 @@ import numpy as np
 class bubble_model:
 
     def __init__(self,
-        model="RPE",
-        R=1.,
-        V=0.,
-        R0=1.,
-        gamma=1.4,
-        Ca=1.,
-        Re_inv=0,
-        Web=0
-        ):
+            config={},
+            R0=1.):
 
-        self.model = model
-        self.Re_inv = Re_inv
-        self.Web = Web
-        self.gamma = gamma
-        self.Ca = Ca
+        if "model" in config:
+            self.model = config["model"]
+        else:
+            self.model = "RPE"
+
         self.R0 = R0
-        self.R = R
-        self.V = V
 
-        self.viscosity = False
-        self.tension = False
-        if self.Re_inv > 0.:
-            self.viscosity == True
-        if self.Web > 0.:
-            self.tension == True
+        if "R" in config:
+            self.R = config["R"]
+        else:
+            self.R = self.R0
+
+        if "V" in config:
+            self.V = config["V"]
+        else:
+            self.V = 0.
+
+        if "gamma" in config:
+            self.gamma = config["gamma"]
+        else:
+            self.gamma = 1.4
+
+        if "Ca" in config:
+            self.Ca = config["Ca"]
+        else:
+            self.Ca = 1.
+
+        if "Re_inv" in config:
+            self.Re_inv = config["Re_inv"]
+            if self.Re_inv <= 0.:
+                raise ValueError(self.Re_inv)
+            else:
+                self.viscosity = True
+        else:
+            self.viscosity = False
+            self.Re_inv = 0
+
+        if "Web" in config:
+            self.Web = config["Web"]
+            if self.Web <= 0.:
+                raise ValueError(self.Web)
+            else:
+                self.tension = True
+        else:
+            self.tension = False
+            self.Web = 0
 
         if self.model == "RPE":
             self.num_RV_dim = 2
             self.state = np.array([self.R,self.V])
-
         else:
             raise NotImplementedError
 
@@ -68,6 +91,15 @@ class bubble_model:
 
 if __name__ == "__main__":
 
-    mybub = bubble_model()
-    rhs = mybub.rhs(p=1.0)
+    config = {}
+    config["model"] = "RPE"
+    config["R"] = 1.
+    config["V"] = 0.
+    config["gamma"] = 1.4
+    config["Ca"] = 1.
+    # config["Re_inv"] = 0
+    # config["Web"] = 0
+
+    mybub = bubble_model(config=config,R0=1.)
+    rhs = mybub.rhs(p=1.1)
     print('rhs = ',rhs)
