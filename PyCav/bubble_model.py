@@ -31,6 +31,8 @@ class bubble_model:
 
         if self.model == "RPE":
             self.num_RV_dim = 2
+            self.state = np.array([self.R,self.V])
+
         else:
             raise NotImplementedError
 
@@ -41,22 +43,28 @@ class bubble_model:
             self.cpbw += 2./(self.Web*self.R0)*(self.R0/self.R)**(3.*gamma)
 
     def rpe(self,p):
+        self.pbw()
         rhs = -1.5*self.V**2.0 + (self.cpbw - p)/self.R
         if self.viscosity:
             rhs -= 4.0*self.Re_inv*self.V/(self.R**2.0)
         return [self.V, rhs]
 
+
     def rhs(self,p):
-        self.pbw()
+        self.update_state()
         if self.model == "RPE":
             rhs = self.rpe(p)
         else:
             raise NotImplementedError
         return rhs
     
-    def state(self):
+
+    def update_state(self):
         if self.model == "RPE":
-            return np.array([ self.R, self.V ])
+            self.R = self.state[0]
+            self.V = self.state[1]
+        else:
+            raise NotImplementedError
 
 if __name__ == "__main__":
 

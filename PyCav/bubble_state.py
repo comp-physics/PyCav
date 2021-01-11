@@ -1,14 +1,14 @@
+import bubble_model as bm
 import numpy as np
-import bubble_model as bub
 
-class state:
+class bubble_state:
 
     def __init__(self,
         model="RPE",
         NR0=1,
         shape="lognormal",
         sigR0=0.3,
-        binning="simpson"
+        binning="Simpson"
         ):
 
         self.model = model
@@ -21,7 +21,7 @@ class state:
         if self.NR0 == 1:
             self.init_mono()
         elif self.NR0 > 1:
-            if self.binning == "simpson":
+            if self.binning == "Simpson":
                self.init_simp() 
             else:
                 raise NotImplementedError
@@ -32,7 +32,10 @@ class state:
         self.num_RV_dim = self.bubble[0].num_RV_dim
         self.vals = np.zeros((self.NR0,self.num_RV_dim))
         for i in range(self.NR0):
-            self.vals[i,:] = self.bubble[i].state()
+            self.vals[i,:] = self.bubble[i].state
+            # Create view so that bubble state is
+            # auto-updated when changing vals
+            self.bubble[i].state = self.vals[i,:].view()
 
         self.rhs = np.zeros((self.NR0,self.num_RV_dim))
 
@@ -42,21 +45,31 @@ class state:
     def init_mono(self):
         self.w = np.ones(1)
         self.R0 = np.ones(1)
-        self.bubble = [ bub.bubble_model(model=self.model,R0=1) ]
+        self.bubble = [ bm.bubble_model(model=self.model,R0=1) ]
 
     def get_rhs(self,p):
         for i in range(self.NR0):
             self.rhs[i,:] = self.bubble[i].rhs(p)
 
+    def update_vals(self,dv):
+        # self.vals += dv
+        # self.
+        # for i in range(self.NR0):
+            # self.vals[i,:] = self.bubble[i].rhs(p)
+        return
+
 if __name__ == "__main__":
 
-    stat = state()
-    val = stat.vals
-    print('state 0 = ',val)
+    state = bubble_state()
+    val = state.vals
     p = 1.1
     dt = 0.1
-    stat.get_rhs(p)
-    val += dt * stat.rhs
-    
-    print('rhs = ',stat.rhs)
-    print('state 1 = ',val)
+
+    print('state = ',val)
+    for i in range(5):
+        state.get_rhs(p)
+        val += dt * state.rhs
+        print('state = ',val)
+        # print('state2 = ', state.bubble[0].state)
+        # print('rhs    = ',state.rhs)
+
