@@ -4,29 +4,29 @@ import numpy as np
 class bubble_state:
 
     def __init__(self,
-        state_config={},
+        pop_config={},
         model_config={}
         ):
 
         self.model_config = model_config
 
-        if "NR0" in state_config:
-            self.NR0 = state_config["NR0"]
+        if "NR0" in pop_config:
+            self.NR0 = pop_config["NR0"]
         else:
             self.NR0 = 1
 
-        if "shape" in state_config:
-            self.shape = state_config["shape"]
+        if "shape" in pop_config:
+            self.shape = pop_config["shape"]
         else:
             self.shape = "lognormal"
 
-        if "binning" in state_config:
-            self.binning= state_config["binning"]
+        if "binning" in pop_config:
+            self.binning = pop_config["binning"]
         else:
-            self.binning= "Simpson"
+            self.binning = "Simpson"
 
-        if "sigR0" in state_config:
-            self.sigR0 = state_config["sigR0"]
+        if "sigR0" in pop_config:
+            self.sigR0 = pop_config["sigR0"]
         else:
             self.sigR0 = 0.3
 
@@ -53,16 +53,33 @@ class bubble_state:
         self.rhs = np.zeros((self.NR0,self.num_RV_dim))
 
     def init_simp(self):
+        self.w = np.ones(1)
+        self.R0 = np.ones(1)
+        self.bubble = [ bm.bubble_model(config=self.model_config,R0=1) ]
+
         raise NotImplementedError
 
     def init_mono(self):
         self.w = np.ones(1)
-        self.R0 = np.ones(1)
+        # self.R0 = np.ones(1)
         self.bubble = [ bm.bubble_model(config=self.model_config,R0=1) ]
 
     def get_rhs(self,p):
         for i in range(self.NR0):
             self.rhs[i,:] = self.bubble[i].rhs(p)
+
+    def quad(self,mom):
+        # mom : the moment we want to compute
+        # should be of the same length as the 
+        # number of variables (e.g. R,V)
+        ret = 0.
+        for i in range(self.NR0):
+            change = self.w[i]
+            for j in range(self.num_RV_dim):
+                change *= self.vals[i,j]**mom[j]
+            ret += change
+
+        return  ret
 
 if __name__ == "__main__":
 

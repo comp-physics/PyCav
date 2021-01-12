@@ -6,9 +6,29 @@ class time_advancer:
 
     def __init__(self,config={}):
 
-        self.method = config["method"]
-        self.dt = config["dt"]
-        self.T = config["T"]
+        if "T" in config:
+            self.T = config["T"]
+            if self.T <= 0:
+                raise ValueError(self.T)
+        else:
+            raise Exception("No final time T")
+
+        if "dt" in config:
+            self.dt = config["dt"]
+            if self.dt <= 0.:
+                raise ValueError(self.dt)
+        else:
+            raise Exception("No time step dt")
+
+        if "method" in config:
+            self.method = config["method"]
+        else:
+            self.method = "Euler"
+
+        if "p" in config:
+            self.p = config["p"]
+        else:
+            raise Exception("No pressure p")
 
         if self.method == "Euler":
             self.advance = self.euler
@@ -16,20 +36,14 @@ class time_advancer:
         else:
             raise NotImplementedError
 
-        if self.dt <= 0.:
-            raise ValueError(self.dt)
-
-        if self.T <= 0:
-            raise ValueError(self.T)
-
         return
 
     def initialize_state(self,
-            state_config=None,
+            pop_config=None,
             model_config=None):
 
         self.state = bs.bubble_state(
-                state_config=state_config,
+                pop_config=pop_config,
                 model_config=model_config)
 
 
@@ -39,12 +53,13 @@ class time_advancer:
         # self.bubble_mgr.compute_rhs(self.stage_state[0], self.stage_k[0])
         # self.state = self.stage_state[0] + self.time_step * self.stage_k[0]
 
-        p = 1.1
-        self.state.get_rhs(p)
-        print('vals: ', self.state.vals)
-        # print('rhs: ', self.state.rhs)
-        # self.state.update_vals(self.dt*self.state.rhs)
+        self.state.get_rhs(self.p)
         self.state.vals += self.dt * self.state.rhs
+        # print('vals: ', self.state.vals)
+        # print('rhs:  ', self.state.rhs )
+
+        # print(self.state.vals)
+
 
         return
 
@@ -52,20 +67,45 @@ class time_advancer:
         self.time = 0.0
         i_step = 0
         step = True
+        self.save = []
+        self.times = []
+        # its=10
         while step == True:
+            self.times.append(self.time)
+            self.save.append(self.state.vals[0].copy())
+
+            # self.save.append(self.state.vals.copy())
             self.advance()
             i_step += 1
             self.time += self.dt
-            if self.time > self.T:
+
+
+            if self.time >= self.T:
                 step = False
-        return
+            # if i_step % its == 0:
+
+        # self.times.append(self.time)
+        # self.save.append(self.state.vals[0].copy())
+        # print('save: ', self.save)
+        self.save = np.array(self.save,dtype=np.float32)
+        self.plot()
+
+    def plot(self):
+        import matplotlib.pyplot as plt
+        # plt.plot(self.save[:,0],self.save[:,1])
+        plt.plot(self.times,self.save[:,0])
+        plt.xlabel('$t$')
+        plt.ylabel('$R(t)$')
+        plt.show()
+        
+                
 
 if __name__ == "__main__":
 
     config = {}
-    config["advancer"] = {}
-    config["advancer"]["method"] = "Euler"
-    config["advancer"]["dt"] = 1.0e-5
-    config["advancer"]["T"] = 30.0
-    myadv = time_advancer(config["advancer"])
+    config["method"] = "Euler"
+    config["dt"] = 1.0e-5
+    config["T"] = 30.0
+    config["p"] = 1.0
+    myadv = time_advancer(config=config)
 

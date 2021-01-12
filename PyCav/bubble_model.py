@@ -63,7 +63,7 @@ class bubble_model:
     def pbw(self):
         self.cpbw = self.Ca*((self.R0/self.R)**(3.0*self.gamma)) - self.Ca + 1.
         if self.tension:
-            self.cpbw += 2./(self.Web*self.R0)*(self.R0/self.R)**(3.*gamma)
+            self.cpbw += 2./(self.Web*self.R0)*(self.R0/self.R)**(3.*self.gamma)
 
     def rpe(self,p):
         self.pbw()
