@@ -1,4 +1,6 @@
 import numpy as np
+import scipy.integrate as sp
+import matplotlib.pyplot as plt
 
 class bubble_model:
 
@@ -89,6 +91,21 @@ class bubble_model:
         else:
             raise NotImplementedError
 
+    def wrap(self,t,y):
+        self.R = y[0]
+        self.V = y[1]
+        return np.array(self.rpe(1.1))
+        
+    def mc_solve(self):
+        t0 = 0.
+        T = 10.
+        y0 = np.array([1.,0.])
+        ret = sp.solve_ivp(self.wrap,(t0,T),y0,method='RK45')
+        # print(ret.t)
+        # print(ret.y)
+        plt.plot(ret.t,ret.y[0])
+        plt.show()
+
 if __name__ == "__main__":
 
     config = {}
@@ -101,5 +118,8 @@ if __name__ == "__main__":
     # config["Web"] = 0
 
     mybub = bubble_model(config=config,R0=1.)
-    rhs = mybub.rhs(p=1.1)
-    print('rhs = ',rhs)
+    # rhs = mybub.rhs(p=1.1)
+    # print('rhs = ',rhs)
+
+    mybub.mc_solve()
+
