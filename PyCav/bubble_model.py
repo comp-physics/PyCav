@@ -98,7 +98,7 @@ class bubble_model:
         if T==0:
             raise ValueError(T)
         y0 = np.array([Ro,Vo])
-        ret = sp.solve_ivp(self.wrap,(0.,T),y0,method='RK45',rtol=1e-5)
+        ret = sp.solve_ivp(self.wrap,(0.,T),y0,method='LSODA',rtol=1e-3)
         return ret
 
 if __name__ == "__main__":
