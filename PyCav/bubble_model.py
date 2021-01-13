@@ -60,7 +60,6 @@ class bubble_model:
             self.state = np.array([self.R,self.V])
         else:
             raise NotImplementedError
-
     
     def pbw(self):
         self.cpbw = self.Ca*((self.R0/self.R)**(3.0*self.gamma)) - self.Ca + 1.
@@ -74,7 +73,6 @@ class bubble_model:
             rhs -= 4.0*self.Re_inv*self.V/(self.R**2.0)
         return [self.V, rhs]
 
-
     def rhs(self,p):
         self.update_state()
         if self.model == "RPE":
@@ -83,7 +81,6 @@ class bubble_model:
             raise NotImplementedError
         return rhs
     
-
     def update_state(self):
         if self.model == "RPE":
             self.R = self.state[0]
@@ -94,17 +91,15 @@ class bubble_model:
     def wrap(self,t,y):
         self.R = y[0]
         self.V = y[1]
-        return np.array(self.rpe(1.1))
+        return np.array(self.rpe(self.p))
         
-    def mc_solve(self):
-        t0 = 0.
-        T = 10.
-        y0 = np.array([1.,0.])
-        ret = sp.solve_ivp(self.wrap,(t0,T),y0,method='RK45')
-        # print(ret.t)
-        # print(ret.y)
-        plt.plot(ret.t,ret.y[0])
-        plt.show()
+    def mc_solve(self,T=0,Ro=1.,Vo=0.,p=1.):
+        self.p = p
+        if T==0:
+            raise ValueError(T)
+        y0 = np.array([Ro,Vo])
+        ret = sp.solve_ivp(self.wrap,(0.,T),y0,method='RK45',rtol=1e-5)
+        return ret
 
 if __name__ == "__main__":
 
@@ -117,9 +112,10 @@ if __name__ == "__main__":
     # config["Re_inv"] = 0
     # config["Web"] = 0
 
-    mybub = bubble_model(config=config,R0=1.)
+    R0 = 0.3
+    mybub = bubble_model(config=config,R0=R0)
     # rhs = mybub.rhs(p=1.1)
-    # print('rhs = ',rhs)
 
-    mybub.mc_solve()
-
+    sol = mybub.mc_solve(T=10.,p=1.1)
+    plt.plot(sol.t,sol.y[0])
+    plt.show()
