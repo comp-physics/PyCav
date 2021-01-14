@@ -16,6 +16,7 @@ def advance_classes():
     config["pop"]["NR0"] = 1
     config["pop"]["shape"] = "lognormal"
     config["pop"]["binning"] = "Simpson"
+    config["pop"]["muR0"] = 1.0
     config["pop"]["sigR0"] = 0.3
 
     # Bubble properties

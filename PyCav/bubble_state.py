@@ -30,6 +30,11 @@ class bubble_state:
         else:
             self.sigR0 = 0.3
 
+        if "muR0" in pop_config:
+            self.muR0 = pop_config["muR0"]
+        else:
+            self.muR0 = 1.0
+
         # Initiate bubbles, weights, abscissas
         if self.NR0 == 1:
             self.init_mono()
@@ -78,8 +83,25 @@ class bubble_state:
             for j in range(self.num_RV_dim):
                 change *= self.vals[i,j]**mom[j]
             ret += change
-
         return  ret
+
+    def random_sample(self,N=0):
+        if self.shape == 'lognormal':
+           return np.random.lognormal(np.log(self.muR0),self.sigR0,N) 
+        elif self.shape == 'normal':
+           return np.random.normal(self.muR0,self.sigR0,N) 
+        else:
+            raise NotImplementedError
+
+    def mc(self,R0=None):
+        pass        
+
+    def moment(self,sample=[],mom=[]):
+        N = len(sample)
+        if self.num_RV_dim == 2:
+            return 1./N * np.sum((sample[:,0]**mom[0])*(sample[:,1]**mom[1]))
+        else:
+            raise NotImplementedError
 
 if __name__ == "__main__":
 
@@ -88,11 +110,11 @@ if __name__ == "__main__":
     p = 1.1
     dt = 0.1
 
-    print('state = ',val)
-    for i in range(5):
-        state.get_rhs(p)
-        val += dt * state.rhs
-        print('state = ',val)
-        # print('state2 = ', state.bubble[0].state)
-        # print('rhs    = ',state.rhs)
+    samp = state.random_sample(N=100)
+
+    # print('state = ',val)
+    # for i in range(5):
+    #     state.get_rhs(p)
+    #     val += dt * state.rhs
+    #     print('state = ',val)
 
