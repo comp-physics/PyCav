@@ -93,7 +93,7 @@ class bubble_model:
         self.V = y[1]
         return np.array(self.rpe(self.p))
         
-    def mc_solve(self,T=0,Ro=1.,Vo=0.,p=1.):
+    def solve(self,T=0,Ro=1.,Vo=0.,p=1.):
         self.p = p
         if T==0:
             raise ValueError(T)
@@ -116,6 +116,6 @@ if __name__ == "__main__":
     mybub = bubble_model(config=config,R0=R0)
     # rhs = mybub.rhs(p=1.1)
 
-    sol = mybub.mc_solve(T=10.,p=1.1)
+    sol = mybub.solve(T=10.,p=1.1)
     plt.plot(sol.t,sol.y[0])
     plt.show()

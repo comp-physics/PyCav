@@ -1,6 +1,7 @@
 import time_advancer as adv
+from mc import mc 
 
-def advance_classes():
+def inputs():
     config = {}
     config["advancer"] = {}
     config["pop"] = {}
@@ -27,6 +28,9 @@ def advance_classes():
     # config["model"]["Ca"] = 0.5
     config["model"]["Re_inv"] = 0.001
     # config["model"]["Web"] = 10.
+    return config
+
+def advance_classes(config):
 
     myadv = adv.time_advancer(
             config=config["advancer"])
@@ -35,11 +39,33 @@ def advance_classes():
             model_config=config["model"])
     myadv.run()
 
-    # print(myadv.state.vals)
-    # print(myadv.state.rhs)
+    return
+
+def advance_mc(config):
+
+    mymc = mc(config)
+    samp = mymc.simulate_sample(N=100)
+
+    # samp = mymc.random_sample(N=100)
+     
+    # state = bubble_state()
+    # val = state.vals
+    # p = 1.1
+    # dt = 0.1
+
+    # print(samp)
 
     return
 
 if __name__ == "__main__":
 
-    advance_classes()
+    
+    config = inputs()
+
+    # Classes
+    # advance_classes(config)
+
+    # MC
+    advance_mc(config)
+
+
