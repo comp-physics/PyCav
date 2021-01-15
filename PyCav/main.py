@@ -44,7 +44,7 @@ def advance_classes(config):
 def advance_mc(config):
 
     mymc = mc(config)
-    samp = mymc.simulate_sample(N=100)
+    mymc.simulate_sample(N=100)
 
     # samp = mymc.random_sample(N=100)
 

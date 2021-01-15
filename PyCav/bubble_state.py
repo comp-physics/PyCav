@@ -41,7 +41,7 @@ class bubble_state:
             else:
                 raise NotImplementedError
         else:
-            raise ValueError(NR0)
+            raise ValueError(self.NR0)
 
         # Assume all bubbles have the same model
         self.num_RV_dim = self.bubble[0].num_RV_dim

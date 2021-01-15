@@ -1,4 +1,3 @@
-import bubble_model as bm
 import bubble_state as bs
 import numpy as np
 
@@ -64,7 +63,7 @@ class time_advancer:
         self.save = []
         self.times = []
         # its=10
-        while step == True:
+        while step:
             self.times.append(self.time)
             self.save.append(self.state.vals[0].copy())
 

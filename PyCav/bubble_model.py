@@ -6,6 +6,17 @@ import matplotlib.pyplot as plt
 class bubble_model:
     def __init__(self, config={}, R0=1.0):
 
+        self.config = config
+        self.parse_config()
+
+        if self.model == "RPE":
+            self.num_RV_dim = 2
+            self.state = np.array([self.R, self.V])
+        else:
+            raise NotImplementedError
+
+    def parse_config(self):
+
         if "model" in config:
             self.model = config["model"]
         else:
@@ -52,12 +63,6 @@ class bubble_model:
         else:
             self.tension = False
             self.Web = 0
-
-        if self.model == "RPE":
-            self.num_RV_dim = 2
-            self.state = np.array([self.R, self.V])
-        else:
-            raise NotImplementedError
 
     def pbw(self):
         self.cpbw = self.Ca * ((self.R0 / self.R) ** (3.0 * self.gamma)) - self.Ca + 1.0
