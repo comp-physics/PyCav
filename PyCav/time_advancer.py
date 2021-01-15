@@ -2,9 +2,9 @@ import bubble_model as bm
 import bubble_state as bs
 import numpy as np
 
-class time_advancer:
 
-    def __init__(self,config={}):
+class time_advancer:
+    def __init__(self, config={}):
 
         if "T" in config:
             self.T = config["T"]
@@ -15,7 +15,7 @@ class time_advancer:
 
         if "dt" in config:
             self.dt = config["dt"]
-            if self.dt <= 0.:
+            if self.dt <= 0.0:
                 raise ValueError(self.dt)
         else:
             raise Exception("No time step dt")
@@ -38,14 +38,9 @@ class time_advancer:
 
         return
 
-    def initialize_state(self,
-            pop_config=None,
-            model_config=None):
+    def initialize_state(self, pop_config=None, model_config=None):
 
-        self.state = bs.bubble_state(
-                pop_config=pop_config,
-                model_config=model_config)
-
+        self.state = bs.bubble_state(pop_config=pop_config, model_config=model_config)
 
     def euler(self):
 
@@ -59,7 +54,6 @@ class time_advancer:
         # print('rhs:  ', self.state.rhs )
 
         # print(self.state.vals)
-
 
         return
 
@@ -79,7 +73,6 @@ class time_advancer:
             i_step += 1
             self.time += self.dt
 
-
             if self.time >= self.T:
                 step = False
             # if i_step % its == 0:
@@ -87,18 +80,18 @@ class time_advancer:
         # self.times.append(self.time)
         # self.save.append(self.state.vals[0].copy())
         # print('save: ', self.save)
-        self.save = np.array(self.save,dtype=np.float32)
+        self.save = np.array(self.save, dtype=np.float32)
         self.plot()
 
     def plot(self):
         import matplotlib.pyplot as plt
+
         # plt.plot(self.save[:,0],self.save[:,1])
-        plt.plot(self.times,self.save[:,0])
-        plt.xlabel('$t$')
-        plt.ylabel('$R(t)$')
+        plt.plot(self.times, self.save[:, 0])
+        plt.xlabel("$t$")
+        plt.ylabel("$R(t)$")
         plt.show()
-        
-                
+
 
 if __name__ == "__main__":
 
@@ -108,4 +101,3 @@ if __name__ == "__main__":
     config["T"] = 30.0
     config["p"] = 1.0
     myadv = time_advancer(config=config)
-

@@ -2,11 +2,9 @@ import numpy as np
 import scipy.integrate as sp
 import matplotlib.pyplot as plt
 
-class bubble_model:
 
-    def __init__(self,
-            config={},
-            R0=1.):
+class bubble_model:
+    def __init__(self, config={}, R0=1.0):
 
         if "model" in config:
             self.model = config["model"]
@@ -23,7 +21,7 @@ class bubble_model:
         if "V" in config:
             self.V = config["V"]
         else:
-            self.V = 0.
+            self.V = 0.0
 
         if "gamma" in config:
             self.gamma = config["gamma"]
@@ -33,11 +31,11 @@ class bubble_model:
         if "Ca" in config:
             self.Ca = config["Ca"]
         else:
-            self.Ca = 1.
+            self.Ca = 1.0
 
         if "Re_inv" in config:
             self.Re_inv = config["Re_inv"]
-            if self.Re_inv <= 0.:
+            if self.Re_inv <= 0.0:
                 raise ValueError(self.Re_inv)
             else:
                 self.viscosity = True
@@ -47,7 +45,7 @@ class bubble_model:
 
         if "Web" in config:
             self.Web = config["Web"]
-            if self.Web <= 0.:
+            if self.Web <= 0.0:
                 raise ValueError(self.Web)
             else:
                 self.tension = True
@@ -57,30 +55,32 @@ class bubble_model:
 
         if self.model == "RPE":
             self.num_RV_dim = 2
-            self.state = np.array([self.R,self.V])
+            self.state = np.array([self.R, self.V])
         else:
             raise NotImplementedError
-    
-    def pbw(self):
-        self.cpbw = self.Ca*((self.R0/self.R)**(3.0*self.gamma)) - self.Ca + 1.
-        if self.tension:
-            self.cpbw += 2./(self.Web*self.R0)*(self.R0/self.R)**(3.*self.gamma)
 
-    def rpe(self,p):
+    def pbw(self):
+        self.cpbw = self.Ca * ((self.R0 / self.R) ** (3.0 * self.gamma)) - self.Ca + 1.0
+        if self.tension:
+            self.cpbw += (
+                2.0 / (self.Web * self.R0) * (self.R0 / self.R) ** (3.0 * self.gamma)
+            )
+
+    def rpe(self, p):
         self.pbw()
-        rhs = -1.5*self.V**2.0 + (self.cpbw - p)/self.R
+        rhs = -1.5 * self.V ** 2.0 + (self.cpbw - p) / self.R
         if self.viscosity:
-            rhs -= 4.0*self.Re_inv*self.V/(self.R**2.0)
+            rhs -= 4.0 * self.Re_inv * self.V / (self.R ** 2.0)
         return [self.V, rhs]
 
-    def rhs(self,p):
+    def rhs(self, p):
         self.update_state()
         if self.model == "RPE":
             rhs = self.rpe(p)
         else:
             raise NotImplementedError
         return rhs
-    
+
     def update_state(self):
         if self.model == "RPE":
             self.R = self.state[0]
@@ -88,34 +88,35 @@ class bubble_model:
         else:
             raise NotImplementedError
 
-    def wrap(self,t,y):
+    def wrap(self, t, y):
         self.R = y[0]
         self.V = y[1]
         return np.array(self.rpe(self.p))
-        
-    def solve(self,T=0,Ro=1.,Vo=0.,p=1.):
+
+    def solve(self, T=0, Ro=1.0, Vo=0.0, p=1.0):
         self.p = p
-        if T==0:
+        if T == 0:
             raise ValueError(T)
-        y0 = np.array([Ro,Vo])
-        ret = sp.solve_ivp(self.wrap,(0.,T),y0,method='LSODA',rtol=1e-3)
+        y0 = np.array([Ro, Vo])
+        ret = sp.solve_ivp(self.wrap, (0.0, T), y0, method="LSODA", rtol=1e-3)
         return ret
+
 
 if __name__ == "__main__":
 
     config = {}
     config["model"] = "RPE"
-    config["R"] = 1.
-    config["V"] = 0.
+    config["R"] = 1.0
+    config["V"] = 0.0
     config["gamma"] = 1.4
-    config["Ca"] = 1.
+    config["Ca"] = 1.0
     # config["Re_inv"] = 0
     # config["Web"] = 0
 
     R0 = 0.3
-    mybub = bubble_model(config=config,R0=R0)
+    mybub = bubble_model(config=config, R0=R0)
     # rhs = mybub.rhs(p=1.1)
 
-    sol = mybub.solve(T=10.,p=1.1)
-    plt.plot(sol.t,sol.y[0])
+    sol = mybub.solve(T=10.0, p=1.1)
+    plt.plot(sol.t, sol.y[0])
     plt.show()

@@ -1,6 +1,7 @@
 import math
 import numpy as np
 
+
 def quadrature_1d(weights, abscissas, moment_index):
     xi_to_idx = abscissas ** moment_index
     q = np.dot(weights, xi_to_idx)

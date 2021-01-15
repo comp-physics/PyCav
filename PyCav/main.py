@@ -1,5 +1,6 @@
 import time_advancer as adv
-from mc import mc 
+from mc import mc
+
 
 def inputs():
     config = {}
@@ -22,24 +23,23 @@ def inputs():
 
     # Bubble properties
     config["model"]["model"] = "RPE"
-    config["model"]["R"] = 1.
-    config["model"]["V"] = 0.
+    config["model"]["R"] = 1.0
+    config["model"]["V"] = 0.0
     config["model"]["gamma"] = 1.4
     # config["model"]["Ca"] = 0.5
     config["model"]["Re_inv"] = 0.001
     # config["model"]["Web"] = 10.
     return config
 
+
 def advance_classes(config):
 
-    myadv = adv.time_advancer(
-            config=config["advancer"])
-    myadv.initialize_state(
-            pop_config=config["pop"],
-            model_config=config["model"])
+    myadv = adv.time_advancer(config=config["advancer"])
+    myadv.initialize_state(pop_config=config["pop"], model_config=config["model"])
     myadv.run()
 
     return
+
 
 def advance_mc(config):
 
@@ -47,7 +47,7 @@ def advance_mc(config):
     samp = mymc.simulate_sample(N=100)
 
     # samp = mymc.random_sample(N=100)
-     
+
     # state = bubble_state()
     # val = state.vals
     # p = 1.1
@@ -57,9 +57,9 @@ def advance_mc(config):
 
     return
 
+
 if __name__ == "__main__":
 
-    
     config = inputs()
 
     # Classes
@@ -67,5 +67,3 @@ if __name__ == "__main__":
 
     # MC
     advance_mc(config)
-
-
