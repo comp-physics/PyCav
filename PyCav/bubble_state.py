@@ -6,36 +6,8 @@ class bubble_state:
     def __init__(self, pop_config={}, model_config={}):
 
         self.model_config = model_config
-
-        if "NR0" in pop_config:
-            self.NR0 = pop_config["NR0"]
-        else:
-            self.NR0 = 1
-
-        if "shape" in pop_config:
-            self.shape = pop_config["shape"]
-        else:
-            self.shape = "lognormal"
-
-        if "binning" in pop_config:
-            self.binning = pop_config["binning"]
-        else:
-            self.binning = "Simpson"
-
-        if "sigR0" in pop_config:
-            self.sigR0 = pop_config["sigR0"]
-        else:
-            self.sigR0 = 0.3
-
-        if "muR0" in pop_config:
-            self.muR0 = pop_config["muR0"]
-        else:
-            self.muR0 = 1.0
-
-        if "moments" in pop_config:
-            self.moments = pop_config["moments"]
-        else:
-            self.moments = [[0,0]]
+        self.pop_config = pop_config
+        self.parse_config()
 
         # Initiate bubbles, weights, abscissas
         if self.NR0 == 1:
@@ -58,6 +30,38 @@ class bubble_state:
             self.bubble[i].state = self.vals[i, :].view()
 
         self.rhs = np.zeros((self.NR0, self.num_RV_dim))
+
+    def parse_config(self):
+
+        if "NR0" in self.pop_config:
+            self.NR0 = self.pop_config["NR0"]
+        else:
+            self.NR0 = 1
+
+        if "shape" in self.pop_config:
+            self.shape = self.pop_config["shape"]
+        else:
+            self.shape = "lognormal"
+
+        if "binning" in self.pop_config:
+            self.binning = self.pop_config["binning"]
+        else:
+            self.binning = "Simpson"
+
+        if "sigR0" in self.pop_config:
+            self.sigR0 = self.pop_config["sigR0"]
+        else:
+            self.sigR0 = 0.3
+
+        if "muR0" in self.pop_config:
+            self.muR0 = self.pop_config["muR0"]
+        else:
+            self.muR0 = 1.0
+
+        if "moments" in self.pop_config:
+            self.moments = self.pop_config["moments"]
+        else:
+            self.moments = [[0, 0]]
 
     def init_simp(self):
         self.w = np.ones(1)
@@ -91,11 +95,11 @@ class bubble_state:
         Nmc = len(sample)
         Nmom = len(self.moments)
         Nt = len(sample[0].y[0])
-        ret = np.zeros((Nmom,Nt))
+        ret = np.zeros((Nmom, Nt))
         for k, mom in enumerate(self.moments):
             if self.num_RV_dim == 2:
                 for samp in sample:
-                    ret[k,:] += samp.y[0] ** mom[0] * samp.y[1] ** mom[1]
+                    ret[k, :] += samp.y[0] ** mom[0] * samp.y[1] ** mom[1]
             else:
                 raise NotImplementedError
 

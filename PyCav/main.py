@@ -9,7 +9,6 @@ def inputs():
     config["pop"] = {}
     config["model"] = {}
 
-
     # Advancer parameters
     config["advancer"]["method"] = "Euler"
     config["advancer"]["dt"] = 0.001
@@ -22,7 +21,7 @@ def inputs():
     config["pop"]["binning"] = "Simpson"
     config["pop"]["muR0"] = 1.0
     config["pop"]["sigR0"] = 0.001
-    config["pop"]["moments"] = [ [0,0], [1,0], [0,1] ]
+    config["pop"]["moments"] = [[0, 0], [1, 0], [0, 1]]
 
     # Bubble properties
     config["model"]["model"] = "RPE"
@@ -46,7 +45,7 @@ def advance_classes(config):
 def advance_mc(config):
 
     mymc = mc(config)
-    sols = mymc.simulate_sample(Nmc=10,Nt=100)
+    sols = mymc.simulate_sample(Nmc=10, Nt=100)
     # for i in range(10):
     #     print(sols[i].y[0])
 
@@ -54,10 +53,10 @@ def advance_mc(config):
     Nmom = len(mymc.state.moments)
     # print('mom - ', moments)
     for i in range(Nmom):
-        plt.subplot(1,Nmom,i+1)
+        plt.subplot(1, Nmom, i + 1)
         plt.plot(sols[i].t, moments[i])
         plt.xlabel("$t$")
-        plt.ylabel("$M$" + str(mymc.state.moments[i]) )
+        plt.ylabel("$M$" + str(mymc.state.moments[i]))
 
     plt.tight_layout()
     plt.show()

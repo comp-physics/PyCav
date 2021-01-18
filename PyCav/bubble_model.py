@@ -105,7 +105,9 @@ class bubble_model:
         if ts is None:
             ret = sp.solve_ivp(self.wrap, (0.0, T), y0, method="LSODA", rtol=1e-3)
         else:
-            ret = sp.solve_ivp(self.wrap, (0.0, T), y0, method="LSODA", rtol=1e-3, t_eval=ts)
+            ret = sp.solve_ivp(
+                self.wrap, (0.0, T), y0, method="LSODA", rtol=1e-3, t_eval=ts
+            )
 
         return ret
 
