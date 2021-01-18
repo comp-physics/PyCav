@@ -1,5 +1,11 @@
 # PyCav
 
+## Todo
+
+- [ ] Turn pressure from constant to time-dependent function
+- [ ] Verify Monte Carlo gets moments right
+- [ ] Implement Simpson's rule
+
 ## Goals
 
 Stage 1:
