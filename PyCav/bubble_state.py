@@ -1,8 +1,11 @@
 import bubble_model as bm
 import numpy as np
+import scipy.stats as sp
+import matplotlib.pyplot as plt
 
 
 class bubble_state:
+
     def __init__(self, pop_config={}, model_config={}):
 
         self.model_config = model_config
@@ -63,17 +66,38 @@ class bubble_state:
         else:
             self.moments = [[0, 0]]
 
+    def init_pdf(self):
+        if self.shape == "lognormal":
+            self.f = sp.lognorm.pdf(self.R0,self.sigR0,loc=np.log(self.muR0))
+        elif self.shape == "normal":
+            self.f = sp.norm.pdf(self.R0,self.sigR0,loc=self.muR0)
+        else:
+            raise NotImplementedError
+
     def init_simp(self):
+        a = 0.8*np.exp(-2.8*self.sigR0)
+        b = 0.2*np.exp( 9.5*self.sigR0)+1.
+        dR0 = (b-a)/(self.NR0-1.)
+        self.R0 = np.logspace(np.log10(a),np.log10(b),num=self.NR0)
+        self.init_pdf()
+
+        self.w = np.zeros(self.NR0)
+        for i in range(self.NR0):
+            if i == 0 or i == self.NR0-1: 
+                self.w[i] = 1./3.
+            elif i % 2 == 0:
+                self.w[i] = 2./3.
+            else:
+                self.w[i] = 4./3.
+        self.w *= dR0
+        self.w *= self.f
+        self.bubble = [ bm.bubble_model(config=self.model_config, R0=x) for x in self.R0 ]
+
+    def init_mono(self):
         self.w = np.ones(1)
         self.R0 = np.ones(1)
         self.bubble = [bm.bubble_model(config=self.model_config, R0=1)]
 
-        raise NotImplementedError
-
-    def init_mono(self):
-        self.w = np.ones(1)
-        # self.R0 = np.ones(1)
-        self.bubble = [bm.bubble_model(config=self.model_config, R0=1)]
 
     def get_rhs(self, p):
         for i in range(self.NR0):
@@ -109,13 +133,32 @@ class bubble_state:
 
 if __name__ == "__main__":
 
-    state = bubble_state()
-    val = state.vals
-    p = 1.1
-    dt = 0.1
+    pop_config = {}
+    pop_config["NR0"] = 101
+    pop_config["shape"] = "lognormal"
+    pop_config["binning"] = "Simpson"
+    pop_config["muR0"] = 1.0
+    pop_config["sigR0"] = 0.1
+    pop_config["moments"] = [[0, 0], [1, 0], [0, 1]]
 
-    print("state = ", val)
-    for i in range(5):
-        state.get_rhs(p)
-        val += dt * state.rhs
-        print("state = ", val)
+    model_config = {}
+    model_config["model"] = "RPE"
+    model_config["V"] = 0.0
+    model_config["gamma"] = 1.4
+    model_config["Re_inv"] = 0.001
+
+    state = bubble_state(
+            pop_config=pop_config,
+            model_config=model_config)
+
+    val = state.vals
+    # print("state = ", val)
+    plt.plot(state.R0,state.w)
+    plt.show()
+
+    # p = 1.1
+    # dt = 0.001
+    # for i in range(5):
+    #     state.get_rhs(p)
+    #     val += dt * state.rhs
+    #     print("state = ", val)

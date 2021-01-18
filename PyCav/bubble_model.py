@@ -116,7 +116,7 @@ if __name__ == "__main__":
 
     config = {}
     config["model"] = "RPE"
-    config["R"] = 1.0
+    # config["R"] = 1.0
     config["V"] = 0.0
     config["gamma"] = 1.4
     config["Ca"] = 1.0

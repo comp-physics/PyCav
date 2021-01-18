@@ -12,20 +12,20 @@ def inputs():
     # Advancer parameters
     config["advancer"]["method"] = "Euler"
     config["advancer"]["dt"] = 0.001
-    config["advancer"]["T"] = 10
-    config["advancer"]["p"] = 3
+    config["advancer"]["T"] = 2
+    config["advancer"]["p"] = 1.1
 
     # Population properties
-    config["pop"]["NR0"] = 1
+    config["pop"]["NR0"] = 7
     config["pop"]["shape"] = "lognormal"
     config["pop"]["binning"] = "Simpson"
     config["pop"]["muR0"] = 1.0
-    config["pop"]["sigR0"] = 0.001
+    config["pop"]["sigR0"] = 0.3
     config["pop"]["moments"] = [[0, 0], [1, 0], [0, 1]]
 
     # Bubble properties
     config["model"]["model"] = "RPE"
-    config["model"]["R"] = 1.0
+    # config["model"]["R"] = 1.0
     config["model"]["V"] = 0.0
     config["model"]["gamma"] = 1.4
     # config["model"]["Ca"] = 0.5
@@ -67,7 +67,7 @@ if __name__ == "__main__":
     config = inputs()
 
     # Classes
-    # advance_classes(config)
+    advance_classes(config)
 
     # MC
-    advance_mc(config)
+    # advance_mc(config)
