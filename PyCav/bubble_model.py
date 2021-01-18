@@ -7,6 +7,7 @@ class bubble_model:
     def __init__(self, config={}, R0=1.0):
 
         self.config = config
+        self.R0 = R0
         self.parse_config()
 
         if self.model == "RPE":
@@ -17,35 +18,33 @@ class bubble_model:
 
     def parse_config(self):
 
-        if "model" in config:
-            self.model = config["model"]
+        if "model" in self.config:
+            self.model = self.config["model"]
         else:
             self.model = "RPE"
 
-        self.R0 = R0
-
-        if "R" in config:
-            self.R = config["R"]
+        if "R" in self.config:
+            self.R = self.config["R"]
         else:
             self.R = self.R0
 
-        if "V" in config:
-            self.V = config["V"]
+        if "V" in self.config:
+            self.V = self.config["V"]
         else:
             self.V = 0.0
 
-        if "gamma" in config:
-            self.gamma = config["gamma"]
+        if "gamma" in self.config:
+            self.gamma = self.config["gamma"]
         else:
             self.gamma = 1.4
 
-        if "Ca" in config:
-            self.Ca = config["Ca"]
+        if "Ca" in self.config:
+            self.Ca = self.config["Ca"]
         else:
             self.Ca = 1.0
 
-        if "Re_inv" in config:
-            self.Re_inv = config["Re_inv"]
+        if "Re_inv" in self.config:
+            self.Re_inv = self.config["Re_inv"]
             if self.Re_inv <= 0.0:
                 raise ValueError(self.Re_inv)
             else:
@@ -54,8 +53,8 @@ class bubble_model:
             self.viscosity = False
             self.Re_inv = 0
 
-        if "Web" in config:
-            self.Web = config["Web"]
+        if "Web" in self.config:
+            self.Web = self.config["Web"]
             if self.Web <= 0.0:
                 raise ValueError(self.Web)
             else:
@@ -98,12 +97,16 @@ class bubble_model:
         self.V = y[1]
         return np.array(self.rpe(self.p))
 
-    def solve(self, T=0, Ro=1.0, Vo=0.0, p=1.0):
+    def solve(self, T=0, Ro=1.0, Vo=0.0, p=1.0, ts=None):
         self.p = p
         if T == 0:
             raise ValueError(T)
         y0 = np.array([Ro, Vo])
-        ret = sp.solve_ivp(self.wrap, (0.0, T), y0, method="LSODA", rtol=1e-3)
+        if ts is None:
+            ret = sp.solve_ivp(self.wrap, (0.0, T), y0, method="LSODA", rtol=1e-3)
+        else:
+            ret = sp.solve_ivp(self.wrap, (0.0, T), y0, method="LSODA", rtol=1e-3, t_eval=ts)
+
         return ret
 
 

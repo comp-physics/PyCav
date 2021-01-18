@@ -32,6 +32,11 @@ class bubble_state:
         else:
             self.muR0 = 1.0
 
+        if "moments" in pop_config:
+            self.moments = pop_config["moments"]
+        else:
+            self.moments = [[0,0]]
+
         # Initiate bubbles, weights, abscissas
         if self.NR0 == 1:
             self.init_mono()
@@ -80,6 +85,21 @@ class bubble_state:
             for j in range(self.num_RV_dim):
                 change *= self.vals[i, j] ** mom[j]
             ret += change
+        return ret
+
+    def moment(self, sample=[]):
+        Nmc = len(sample)
+        Nmom = len(self.moments)
+        Nt = len(sample[0].y[0])
+        ret = np.zeros((Nmom,Nt))
+        for k, mom in enumerate(self.moments):
+            if self.num_RV_dim == 2:
+                for samp in sample:
+                    ret[k,:] += samp.y[0] ** mom[0] * samp.y[1] ** mom[1]
+            else:
+                raise NotImplementedError
+
+        ret = ret / Nmc
         return ret
 
 
