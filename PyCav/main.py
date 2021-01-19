@@ -1,6 +1,6 @@
+import matplotlib.pyplot as plt
 import time_advancer as adv
 from mc import mc
-import matplotlib.pyplot as plt
 
 def inputs():
     config = {}
@@ -11,7 +11,7 @@ def inputs():
     # Advancer parameters
     config["advancer"]["method"] = "Euler"
     config["advancer"]["dt"] = 0.001
-    config["advancer"]["T"] = 10
+    config["advancer"]["T"] = 1
     config["advancer"]["p"] = 3
 
     # Population properties
@@ -44,19 +44,16 @@ def advance_classes(config):
 def advance_mc(config):
 
     mymc = mc(config)
-    sols = mymc.simulate_sample(Nmc=10, Nt=100)
-    # for i in range(10):
-    #     print(sols[i].y[0])
-
+    sols = mymc.simulate_sample(Nmc=200, Nt=100)
     moments = mymc.state.moment(sols)
-    for i in range(mymc.state.Nmom):
-        plt.subplot(1, mymc.state.Nmom, i + 1)
-        plt.plot(sols[i].t, moments[i])
-        plt.xlabel("$t$")
-        plt.ylabel("$M$" + str(mymc.state.moments[i]))
 
-    plt.tight_layout()
-    plt.show()
+    fig, ax = plt.subplots(1,mymc.state.Nmom)
+    for i in range(mymc.state.Nmom):
+        ax[i].plot(sols[i].t, moments[i])
+        ax[i].set(
+                xlabel="$t$",
+                ylabel="$M$" + str(mymc.state.moments[i])
+                )
 
 
 if __name__ == "__main__":
@@ -67,4 +64,8 @@ if __name__ == "__main__":
     advance_classes(config)
 
     # MC
-    # advance_mc(config)
+    advance_mc(config)
+
+    plt.show()
+
+    # plt.savefig('out.pdf')

@@ -112,7 +112,6 @@ class bubble_state:
         # plt.plot(self.R0,self.f)
         # plt.xscale("log")
         # plt.show()
-        # exit(0)
 
         self.bubble = [ bm.bubble_model(config=self.model_config, R0=x) for x in self.R0 ]
 

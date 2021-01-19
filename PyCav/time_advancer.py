@@ -74,10 +74,10 @@ class time_advancer:
 
         self.save = np.array(self.save, dtype=np.float32)
         self.moms = np.array(self.moms, dtype=np.float32)
-        # self.plot()
+        self.plot()
 
     def plot(self):
-        import matplotlib.pyplot as plt
+        # import matplotlib.pyplot as plt
 
         # plot R evolution for all quad points
         # for i in range(self.state.NR0):
@@ -87,17 +87,14 @@ class time_advancer:
         # plt.ylabel("$R(t)$")
         # plt.show()
 
-        for i in range(self.state.Nmom):
-            plt.subplot(1, self.state.Nmom, i + 1)
-            plt.plot(self.times, self.moms[:,i])
-            plt.xlabel("$t$")
-            plt.ylabel("$M$" + str(self.state.moments[i]))
-
-        plt.tight_layout()
-        plt.show()
-
-
-
+        # fig, ax = plt.subplots(1,self.state.Nmom)
+        # for i in range(self.state.Nmom):
+        #     ax[i].plot(self.times, self.moms[:,i])
+        #     ax[i].set(
+        #             xlabel="$t$",
+        #             ylabel="$M$" + str(self.state.moments[i])
+        #             )
+        # plt.tight_layout()
 
 if __name__ == "__main__":
 

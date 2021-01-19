@@ -43,10 +43,3 @@ class mc:
             sols.append(sol)
 
         return sols
-
-
-# if __name__ == "__main__":
-#     monte = mc()
-
-# plt.plot(sol.t,sol.y[0])
-# plt.show()
