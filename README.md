@@ -2,9 +2,12 @@
 
 ## Todo
 
+- [x] Verify Monte Carlo gets moments right
+- [x] Implement Simpson's rule
 - [ ] Turn pressure from constant to time-dependent function
-- [ ] Verify Monte Carlo gets moments right
-- [ ] Implement Simpson's rule
+- [ ] Adaptive RK23 
+- [ ] Linear bubble dynamics 
+* [ ] Keller Miksis
 
 ## Goals
 
