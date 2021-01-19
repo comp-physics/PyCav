@@ -2,7 +2,6 @@ import time_advancer as adv
 from mc import mc
 import matplotlib.pyplot as plt
 
-
 def inputs():
     config = {}
     config["advancer"] = {}
@@ -12,15 +11,15 @@ def inputs():
     # Advancer parameters
     config["advancer"]["method"] = "Euler"
     config["advancer"]["dt"] = 0.001
-    config["advancer"]["T"] = 2
-    config["advancer"]["p"] = 1.1
+    config["advancer"]["T"] = 10
+    config["advancer"]["p"] = 3
 
     # Population properties
-    config["pop"]["NR0"] = 7
+    config["pop"]["NR0"] = 201
     config["pop"]["shape"] = "lognormal"
     config["pop"]["binning"] = "Simpson"
     config["pop"]["muR0"] = 1.0
-    config["pop"]["sigR0"] = 0.3
+    config["pop"]["sigR0"] = 0.1
     config["pop"]["moments"] = [[0, 0], [1, 0], [0, 1]]
 
     # Bubble properties
@@ -29,7 +28,7 @@ def inputs():
     config["model"]["V"] = 0.0
     config["model"]["gamma"] = 1.4
     # config["model"]["Ca"] = 0.5
-    config["model"]["Re_inv"] = 0.001
+    # config["model"]["Re_inv"] = 0.001
     # config["model"]["Web"] = 10.
 
     return config
@@ -50,10 +49,8 @@ def advance_mc(config):
     #     print(sols[i].y[0])
 
     moments = mymc.state.moment(sols)
-    Nmom = len(mymc.state.moments)
-    # print('mom - ', moments)
-    for i in range(Nmom):
-        plt.subplot(1, Nmom, i + 1)
+    for i in range(mymc.state.Nmom):
+        plt.subplot(1, mymc.state.Nmom, i + 1)
         plt.plot(sols[i].t, moments[i])
         plt.xlabel("$t$")
         plt.ylabel("$M$" + str(mymc.state.moments[i]))

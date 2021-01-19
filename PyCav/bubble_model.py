@@ -2,7 +2,6 @@ import numpy as np
 import scipy.integrate as sp
 import matplotlib.pyplot as plt
 
-
 class bubble_model:
     def __init__(self, config={}, R0=1.0):
 

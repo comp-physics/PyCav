@@ -2,6 +2,7 @@ import bubble_model as bm
 import numpy as np
 import scipy.stats as sp
 import matplotlib.pyplot as plt
+from sys import exit
 
 
 class bubble_state:
@@ -25,6 +26,11 @@ class bubble_state:
 
         # Assume all bubbles have the same model
         self.num_RV_dim = self.bubble[0].num_RV_dim
+
+        for mom in self.moments:
+            if len(mom) != self.num_RV_dim:
+                raise ValueError(mom,self.num_RV_dim)
+
         self.vals = np.zeros((self.NR0, self.num_RV_dim))
         for i in range(self.NR0):
             self.vals[i, :] = self.bubble[i].state
@@ -63,8 +69,10 @@ class bubble_state:
 
         if "moments" in self.pop_config:
             self.moments = self.pop_config["moments"]
+            self.Nmom = len(self.moments)
         else:
             self.moments = [[0, 0]]
+            self.Nmom = 1
 
     def init_pdf(self):
         if self.shape == "lognormal":
@@ -77,8 +85,14 @@ class bubble_state:
     def init_simp(self):
         a = 0.8*np.exp(-2.8*self.sigR0)
         b = 0.2*np.exp( 9.5*self.sigR0)+1.
-        dR0 = (b-a)/(self.NR0-1.)
+        # dR0 = (b-a)/(self.NR0-1.)
         self.R0 = np.logspace(np.log10(a),np.log10(b),num=self.NR0)
+
+        self.dR0 = np.zeros(self.NR0)
+        for i in range(self.NR0-1):
+            self.dR0[i] = self.R0[i+1] - self.R0[i] 
+        self.dR0[self.NR0-1] = self.dR0[self.NR0-2]
+        
         self.init_pdf()
 
         self.w = np.zeros(self.NR0)
@@ -89,8 +103,17 @@ class bubble_state:
                 self.w[i] = 2./3.
             else:
                 self.w[i] = 4./3.
-        self.w *= dR0
+
+        self.w *= self.dR0
         self.w *= self.f
+
+        # print(np.sum(self.w))
+        # print(np.sum(self.f*self.dR0))
+        # plt.plot(self.R0,self.f)
+        # plt.xscale("log")
+        # plt.show()
+        # exit(0)
+
         self.bubble = [ bm.bubble_model(config=self.model_config, R0=x) for x in self.R0 ]
 
     def init_mono(self):
@@ -103,23 +126,22 @@ class bubble_state:
         for i in range(self.NR0):
             self.rhs[i, :] = self.bubble[i].rhs(p)
 
-    def quad(self, mom):
-        # mom : the moment we want to compute
+    def get_quad(self):
         # should be of the same length as the
         # number of variables (e.g. R,V)
-        ret = 0.0
-        for i in range(self.NR0):
-            change = self.w[i]
-            for j in range(self.num_RV_dim):
-                change *= self.vals[i, j] ** mom[j]
-            ret += change
+        ret = np.zeros(self.Nmom)
+        for k, mom in enumerate(self.moments):
+            # for i in range(self.NR0):
+            if self.num_RV_dim == 2:
+                ret[k] = np.sum(self.w[:] *
+                        self.vals[:,0] ** mom[0] *
+                        self.vals[:,1] ** mom[1])
         return ret
 
     def moment(self, sample=[]):
         Nmc = len(sample)
-        Nmom = len(self.moments)
         Nt = len(sample[0].y[0])
-        ret = np.zeros((Nmom, Nt))
+        ret = np.zeros((self.Nmom, Nt))
         for k, mom in enumerate(self.moments):
             if self.num_RV_dim == 2:
                 for samp in sample:

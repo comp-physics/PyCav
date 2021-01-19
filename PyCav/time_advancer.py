@@ -1,5 +1,6 @@
 import bubble_state as bs
 import numpy as np
+from sys import exit
 
 
 class time_advancer:
@@ -57,9 +58,13 @@ class time_advancer:
         step = True
         self.save = []
         self.times = []
+        self.moms = []
+
         while step:
+            print('step = ', i_step)
             self.times.append(self.time)
             self.save.append(self.state.vals.copy())
+            self.moms.append(self.state.get_quad())
             self.advance()
             i_step += 1
             self.time += self.dt
@@ -68,17 +73,30 @@ class time_advancer:
                 step = False
 
         self.save = np.array(self.save, dtype=np.float32)
-        self.plot()
+        self.moms = np.array(self.moms, dtype=np.float32)
+        # self.plot()
 
     def plot(self):
         import matplotlib.pyplot as plt
 
+        # plot R evolution for all quad points
         # for i in range(self.state.NR0):
         #     plt.plot(self.times, self.save[:,i,0])
-        plt.plot(self.times, self.save[:,0,0])
-        plt.xlabel("$t$")
-        plt.ylabel("$R(t)$")
+        # plt.plot(self.times, self.save[:,0,0])
+        # plt.xlabel("$t$")
+        # plt.ylabel("$R(t)$")
+        # plt.show()
+
+        for i in range(self.state.Nmom):
+            plt.subplot(1, self.state.Nmom, i + 1)
+            plt.plot(self.times, self.moms[:,i])
+            plt.xlabel("$t$")
+            plt.ylabel("$M$" + str(self.state.moments[i]))
+
+        plt.tight_layout()
         plt.show()
+
+
 
 
 if __name__ == "__main__":
