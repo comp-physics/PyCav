@@ -4,7 +4,7 @@
 
 - [x] Verify Monte Carlo gets moments right
 - [x] Implement Simpson's rule
-- [ ] Turn pressure from constant to time-dependent function
+- [x] Turn pressure from constant to time-dependent function
 - [ ] Adaptive RK23 
 - [ ] Linear bubble dynamics 
 * [ ] Keller Miksis
