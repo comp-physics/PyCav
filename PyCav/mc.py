@@ -1,6 +1,7 @@
 import bubble_model as bm
 import bubble_state as bs
 import time_advancer as adv
+import waveforms as wf
 import numpy as np
 
 
@@ -11,11 +12,25 @@ class mc:
         self.adv_config = config["advancer"]
         self.pop_config = config["pop"]
         self.model_config = config["model"]
+        self.wave_config = config["wave"]
+        self.mc_config = config["mc"]
+
+        if "Ntimes" in self.mc_config:
+            self.Nt = self.mc_config["Ntimes"]
+        else:
+            raise Exception("No number of output times")
+
+        if "Nsamples" in self.mc_config:
+            self.Nmc = self.mc_config["Nsamples"]
+        else:
+            raise Exception("No number of samples")
+
 
         self.advancer = adv.time_advancer(self.adv_config)
         self.state = bs.bubble_state(
             pop_config=self.pop_config, model_config=self.model_config
         )
+        self.wave = wf.waveforms(config=self.wave_config)
 
     def get_sample(self):
         if self.state.shape == "lognormal":
@@ -27,15 +42,13 @@ class mc:
         else:
             raise NotImplementedError
 
-    def simulate_sample(self, Nmc=1, Nt=10):
-        self.Nmc = Nmc
-        self.Nt = Nt
+    def simulate_sample(self):
         T = self.advancer.T
-        p = self.advancer.p
-        ts = np.linspace(0, T, num=Nt)
+        # p = self.advancer.p
+        p = self.wave.p
+        ts = np.linspace(0, T, num=self.Nt)
 
         self.get_sample()
-        # print('sample = ',self.sample)
         sols = []
         for R0 in self.sample:
             bubble = bm.bubble_model(config=self.model_config, R0=R0)

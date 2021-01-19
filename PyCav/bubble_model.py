@@ -3,6 +3,7 @@ import scipy.integrate as sp
 import matplotlib.pyplot as plt
 
 class bubble_model:
+
     def __init__(self, config={}, R0=1.0):
 
         self.config = config
@@ -16,7 +17,6 @@ class bubble_model:
             raise NotImplementedError
 
     def parse_config(self):
-
         if "model" in self.config:
             self.model = self.config["model"]
         else:
@@ -62,6 +62,7 @@ class bubble_model:
             self.tension = False
             self.Web = 0
 
+
     def pbw(self):
         self.cpbw = self.Ca * ((self.R0 / self.R) ** (3.0 * self.gamma)) - self.Ca + 1.0
         if self.tension:
@@ -69,12 +70,14 @@ class bubble_model:
                 2.0 / (self.Web * self.R0) * (self.R0 / self.R) ** (3.0 * self.gamma)
             )
 
+
     def rpe(self, p):
         self.pbw()
         rhs = -1.5 * self.V ** 2.0 + (self.cpbw - p) / self.R
         if self.viscosity:
             rhs -= 4.0 * self.Re_inv * self.V / (self.R ** 2.0)
         return [self.V, rhs]
+
 
     def rhs(self, p):
         self.update_state()
@@ -94,12 +97,10 @@ class bubble_model:
     def wrap(self, t, y):
         self.R = y[0]
         self.V = y[1]
-        return np.array(self.rpe(self.p))
+        return np.array(self.rpe(self.p(t)))
 
     def solve(self, T=0, Ro=1.0, Vo=0.0, p=1.0, ts=None):
         self.p = p
-        if T == 0:
-            raise ValueError(T)
         y0 = np.array([Ro, Vo])
         if ts is None:
             ret = sp.solve_ivp(self.wrap, (0.0, T), y0, method="LSODA", rtol=1e-3)

@@ -5,14 +5,26 @@ from mc import mc
 def inputs():
     config = {}
     config["advancer"] = {}
+    config["wave"] = {}
     config["pop"] = {}
     config["model"] = {}
+    config["mc"] = {}
 
     # Advancer parameters
     config["advancer"]["method"] = "Euler"
     config["advancer"]["dt"] = 0.001
-    config["advancer"]["T"] = 1
-    config["advancer"]["p"] = 3
+    config["advancer"]["T"] = 10
+
+    # Acoustic
+    config["wave"]["amplitude"] = 3
+    config["wave"]["form"] = "sine"
+    # config["wave"]["form"] = "constant"
+    config["wave"]["period"] = 2.
+    config["wave"]["cycles"] = 2.
+
+    # Monte Carlo
+    config["mc"]["Nsamples"] = 1000
+    config["mc"]["Ntimes"] = 100
 
     # Population properties
     config["pop"]["NR0"] = 201
@@ -38,13 +50,14 @@ def advance_classes(config):
 
     myadv = adv.time_advancer(config=config["advancer"])
     myadv.initialize_state(pop_config=config["pop"], model_config=config["model"])
+    myadv.initialize_wave(wave_config=config["wave"])
     myadv.run()
 
 
 def advance_mc(config):
 
     mymc = mc(config)
-    sols = mymc.simulate_sample(Nmc=200, Nt=100)
+    sols = mymc.simulate_sample()
     moments = mymc.state.moment(sols)
 
     fig, ax = plt.subplots(1,mymc.state.Nmom)

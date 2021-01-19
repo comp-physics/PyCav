@@ -1,9 +1,12 @@
 import bubble_state as bs
+import waveforms as wf
 import numpy as np
 from sys import exit
+import matplotlib.pyplot as plt
 
 
 class time_advancer:
+
     def __init__(self, config={}):
 
         if "T" in config:
@@ -25,11 +28,6 @@ class time_advancer:
         else:
             self.method = "Euler"
 
-        if "p" in config:
-            self.p = config["p"]
-        else:
-            raise Exception("No pressure p")
-
         if self.method == "Euler":
             self.advance = self.euler
             self.n_stages = 1
@@ -39,10 +37,17 @@ class time_advancer:
         return
 
     def initialize_state(self, pop_config=None, model_config=None):
+
         self.state = bs.bubble_state(pop_config=pop_config, model_config=model_config)
 
+    def initialize_wave(self, wave_config=None):
+        
+        self.wave = wf.waveforms(config=wave_config)
+
     def euler(self):
-        self.state.get_rhs(self.p)
+
+        self.state.get_rhs(self.wave.p(self.time))
+        # self.state.get_rhs(self.p)
         self.state.vals += self.dt * self.state.rhs
 
         # self.stage_state[0] = self.state.copy()
@@ -53,6 +58,7 @@ class time_advancer:
         # print(self.state.vals)
 
     def run(self):
+
         self.time = 0.0
         i_step = 0
         step = True
@@ -77,7 +83,6 @@ class time_advancer:
         self.plot()
 
     def plot(self):
-        # import matplotlib.pyplot as plt
 
         # plot R evolution for all quad points
         # for i in range(self.state.NR0):
@@ -87,14 +92,15 @@ class time_advancer:
         # plt.ylabel("$R(t)$")
         # plt.show()
 
-        # fig, ax = plt.subplots(1,self.state.Nmom)
-        # for i in range(self.state.Nmom):
-        #     ax[i].plot(self.times, self.moms[:,i])
-        #     ax[i].set(
-        #             xlabel="$t$",
-        #             ylabel="$M$" + str(self.state.moments[i])
-        #             )
-        # plt.tight_layout()
+        fig, ax = plt.subplots(1,self.state.Nmom)
+        for i in range(self.state.Nmom):
+            ax[i].plot(self.times, self.moms[:,i])
+            ax[i].set(
+                    xlabel="$t$",
+                    ylabel="$M$" + str(self.state.moments[i])
+                    )
+        plt.tight_layout()
+
 
 if __name__ == "__main__":
 
