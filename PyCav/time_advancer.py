@@ -115,7 +115,7 @@ class time_advancer:
         mom = 0.5 * f0 + 0.5 * (f1 + self.dt * L)
 
         self.state.vals[:, :] = mom
-        self.ts_error = np.linalg.norm(mom - mome) / np.linalg.norm(mom)
+        self.ts_error = self.err(fine=mom, coarse=mome)
 
     def rk23(self):
         # SSP-RK2
@@ -136,7 +136,10 @@ class time_advancer:
         L2 = self.state.get_rhs(f2, pdt2)
         mom = 1.0 / 3.0 * f0 + 2.0 / 3.0 * (f2 + self.dt * L2)
         self.state.vals[:, :] = mom
-        self.ts_error = np.linalg.norm(mom - mome) / np.linalg.norm(mom)
+        self.ts_error = self.err(fine=mom, coarse=mome)
+
+    def err(self, fine=0.0, coarse=0.0):
+        return np.linalg.norm(fine - coarse) / np.linalg.norm(fine)
 
     def adapt_stepsize(self):
         error_fraction = np.sqrt(0.5 * self.error_tol / self.ts_error)
