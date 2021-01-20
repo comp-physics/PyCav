@@ -12,10 +12,11 @@ def inputs():
     config["mc"] = {}
 
     # Advancer parameters
-    config["advancer"]["method"] = "Euler"
-    # config["advancer"]["method"] = "RK3"
-    config["advancer"]["dt"] = 0.0001
+    # config["advancer"]["method"] = "Euler"
+    config["advancer"]["method"] = "RK23"
+    config["advancer"]["dt"] = 1.0e-5
     config["advancer"]["T"] = 10
+    config["advancer"]["error_tol"] = 1.0e-3
 
     # Acoustic
     config["wave"]["amplitude"] = 3
