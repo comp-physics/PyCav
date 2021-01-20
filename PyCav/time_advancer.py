@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 class time_advancer:
 
     def __init__(self, config={}):
-
         if "T" in config:
             self.T = config["T"]
             if self.T <= 0:
@@ -30,6 +29,9 @@ class time_advancer:
 
         if self.method == "Euler":
             self.advance = self.euler
+            self.n_stages = 0
+        elif self.method == "RK2":
+            self.advance = self.rk2
             self.n_stages = 1
         else:
             raise NotImplementedError
@@ -37,34 +39,43 @@ class time_advancer:
         return
 
     def initialize_state(self, pop_config=None, model_config=None):
-
         self.state = bs.bubble_state(pop_config=pop_config, model_config=model_config)
 
     def initialize_wave(self, wave_config=None):
-        
         self.wave = wf.waveforms(config=wave_config)
 
     def euler(self):
 
-        self.state.get_rhs(self.wave.p(self.time))
-        # self.state.get_rhs(self.p)
-        self.state.vals += self.dt * self.state.rhs
+        # print(self.state.vals[0,:])
+        # vals = self.state.vals.copy()
+        p = self.wave.p(self.time)
+        f0 = self.state.vals.copy()
+        l1 = self.state.get_rhs(f0,p)
+        self.state.vals[:,:] = self.state.vals + self.dt * l1
 
-        # self.stage_state[0] = self.state.copy()
-        # self.bubble_mgr.compute_rhs(self.stage_state[0], self.stage_k[0])
-        # self.state = self.stage_state[0] + self.time_step * self.stage_k[0]
-        # print('vals: ', self.state.vals)
-        # print('rhs:  ', self.state.rhs )
-        # print(self.state.vals)
+        # update = self.state.vals.copy() + self.dt*l1.copy()
+        # self.state.vals = update
+
+        # self.state.vals += self.dt * l1
+        # print(self.state.vals[0,:])
+        
+    def rk2(self):
+        p = self.wave.p(self.time)
+        f0 = self.state.vals.copy()
+        l1 = self.state.get_rhs(f0,p)
+        f1 = f0 + self.dt * l1
+        L = self.state.get_rhs(f1,p)
+        F = f1 + self.dt*L
+        self.state.vals[:,:] = 0.5*(f0 + F)
 
     def run(self):
-
         self.time = 0.0
         i_step = 0
         step = True
         self.save = []
         self.times = []
         self.moms = []
+        np.set_printoptions(precision=24)
 
         while step:
             print('step = ', i_step)
@@ -83,7 +94,6 @@ class time_advancer:
         self.plot()
 
     def plot(self):
-
         # plot R evolution for all quad points
         # for i in range(self.state.NR0):
         #     plt.plot(self.times, self.save[:,i,0])
@@ -103,7 +113,6 @@ class time_advancer:
 
 
 if __name__ == "__main__":
-
     config = {}
     config["method"] = "Euler"
     config["dt"] = 1.0e-5

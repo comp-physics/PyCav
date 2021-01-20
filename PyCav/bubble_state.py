@@ -120,10 +120,11 @@ class bubble_state:
         self.R0 = np.ones(1)
         self.bubble = [bm.bubble_model(config=self.model_config, R0=1)]
 
-
-    def get_rhs(self, p):
+    def get_rhs(self, state, p):
+        self.vals[:,:] = state  
         for i in range(self.NR0):
             self.rhs[i, :] = self.bubble[i].rhs(p)
+        return self.rhs
 
     def get_quad(self):
         # should be of the same length as the

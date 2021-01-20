@@ -80,6 +80,7 @@ class bubble_model:
 
 
     def rhs(self, p):
+        # print(self.state)
         self.update_state()
         if self.model == "RPE":
             rhs = self.rpe(p)
