@@ -29,9 +29,7 @@ class time_advancer:
         else:
             raise NotImplementedError
 
-        return
-
-    def parse_config(self, config):
+    def parse_config(self):
         if "T" in self.config:
             self.T = self.config["T"]
             if self.T <= 0:
@@ -67,20 +65,10 @@ class time_advancer:
         self.wave = wf.waveforms(config=wave_config)
 
     def euler(self):
-        # print(self.state.vals[0,:])
-        # vals = self.state.vals.copy()
         f0 = self.state.vals.copy()
-
         p = self.wave.p(self.time)
         l1 = self.state.get_rhs(f0, p)
-
         self.state.vals[:, :] = f0 + self.dt * l1
-
-        # update = self.state.vals.copy() + self.dt*l1.copy()
-        # self.state.vals = update
-
-        # self.state.vals += self.dt * l1
-        # print(self.state.vals[0,:])
 
     def rk2(self):
         f0 = self.state.vals.copy()
@@ -111,7 +99,6 @@ class time_advancer:
         self.state.vals[:, :] = 1.0 / 3.0 * f0 + 2.0 / 3.0 * (f2 + self.dt * L2)
 
     def rk23(self):
-
         # SSP-RK2
         f0 = self.state.vals.copy()
 

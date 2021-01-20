@@ -3,34 +3,8 @@ import numpy as np
 
 class waveforms:
     def __init__(self, config={}):
-
-        if "form" in config:
-            self.form = config["form"]
-        else:
-            self.form = "constant"
-
-        if "amplitude" in config:
-            self.amplitude = config["amplitude"]
-        else:
-            raise Exception("No amplitude")
-
-        if "period" in config:
-            self.period = config["period"]
-        else:
-            if self.form == "sine" or self.form == "square":
-                raise Exception("Need period")
-            else:
-                self.period = 1.0
-
-        if "cycles" in config:
-            self.cycles = config["cycles"]
-        else:
-            self.cycles = 1.0
-
-        if "ambient" in config:
-            self.ambient = config["ambient"]
-        else:
-            self.ambient = 1.0
+        self.config = config
+        self.parse_config()
 
         if self.form == "constant":
             self.p = self.p_constant
@@ -40,6 +14,35 @@ class waveforms:
             self.p = self.p_square
         else:
             NotImplementedError
+
+    def parse_config(self):
+        if "form" in self.config:
+            self.form = self.config["form"]
+        else:
+            self.form = "constant"
+
+        if "amplitude" in self.config:
+            self.amplitude = self.config["amplitude"]
+        else:
+            raise Exception("No amplitude")
+
+        if "period" in self.config:
+            self.period = self.config["period"]
+        else:
+            if self.form == "sine" or self.form == "square":
+                raise Exception("Need period")
+            else:
+                self.period = 1.0
+
+        if "cycles" in self.config:
+            self.cycles = self.config["cycles"]
+        else:
+            self.cycles = 1.0
+
+        if "ambient" in self.config:
+            self.ambient = self.config["ambient"]
+        else:
+            self.ambient = 1.0
 
     def p_constant(self, t):
         return self.amplitude
