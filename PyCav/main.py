@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import time_advancer as adv
 from mc import mc
 
+
 def inputs():
     config = {}
     config["advancer"] = {}
@@ -11,17 +12,17 @@ def inputs():
     config["mc"] = {}
 
     # Advancer parameters
-    # config["advancer"]["method"] = "Euler"
-    config["advancer"]["method"] = "RK3"
-    config["advancer"]["dt"] = 0.001
+    config["advancer"]["method"] = "Euler"
+    # config["advancer"]["method"] = "RK3"
+    config["advancer"]["dt"] = 0.0001
     config["advancer"]["T"] = 10
 
     # Acoustic
     config["wave"]["amplitude"] = 3
     config["wave"]["form"] = "sine"
     # config["wave"]["form"] = "constant"
-    config["wave"]["period"] = 2.
-    config["wave"]["cycles"] = 2.
+    config["wave"]["period"] = 2.0
+    config["wave"]["cycles"] = 2.0
 
     # Monte Carlo
     config["mc"]["Nsamples"] = 1000
@@ -61,13 +62,10 @@ def advance_mc(config):
     sols = mymc.simulate_sample()
     moments = mymc.state.moment(sols)
 
-    fig, ax = plt.subplots(1,mymc.state.Nmom)
+    fig, ax = plt.subplots(1, mymc.state.Nmom)
     for i in range(mymc.state.Nmom):
         ax[i].plot(sols[i].t, moments[i])
-        ax[i].set(
-                xlabel="$t$",
-                ylabel="$M$" + str(mymc.state.moments[i])
-                )
+        ax[i].set(xlabel="$t$", ylabel="$M$" + str(mymc.state.moments[i]))
 
 
 if __name__ == "__main__":

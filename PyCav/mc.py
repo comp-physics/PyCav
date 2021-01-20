@@ -6,7 +6,6 @@ import numpy as np
 
 
 class mc:
-
     def __init__(self, config=None):
 
         self.adv_config = config["advancer"]
@@ -24,7 +23,6 @@ class mc:
             self.Nmc = self.mc_config["Nsamples"]
         else:
             raise Exception("No number of samples")
-
 
         self.advancer = adv.time_advancer(self.adv_config)
         self.state = bs.bubble_state(
