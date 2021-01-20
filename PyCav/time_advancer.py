@@ -33,6 +33,9 @@ class time_advancer:
         elif self.method == "RK2":
             self.advance = self.rk2
             self.n_stages = 1
+        elif self.method == "RK3":
+            self.advance = self.rk3
+            self.n_stages = 1
         else:
             raise NotImplementedError
 
@@ -45,7 +48,6 @@ class time_advancer:
         self.wave = wf.waveforms(config=wave_config)
 
     def euler(self):
-
         # print(self.state.vals[0,:])
         # vals = self.state.vals.copy()
         p = self.wave.p(self.time)
@@ -60,13 +62,34 @@ class time_advancer:
         # print(self.state.vals[0,:])
         
     def rk2(self):
-        p = self.wave.p(self.time)
         f0 = self.state.vals.copy()
+
+        p = self.wave.p(self.time)
         l1 = self.state.get_rhs(f0,p)
         f1 = f0 + self.dt * l1
-        L = self.state.get_rhs(f1,p)
+
+        pdt = self.wave.p(self.time+self.dt)
+        L = self.state.get_rhs(f1,pdt)
         F = f1 + self.dt*L
+
         self.state.vals[:,:] = 0.5*(f0 + F)
+
+    def rk3(self):
+        f0 = self.state.vals.copy()
+
+        p = self.wave.p(self.time)
+        l1 = self.state.get_rhs(f0,p)
+        f1 = f0 + self.dt * l1
+
+        pdt = self.wave.p(self.time+self.dt)
+        L = self.state.get_rhs(f1,pdt)
+        f2 = 0.75*f0 + 0.25*(f1 + self.dt*L)
+
+        pdt2 = self.wave.p(self.time+self.dt/2.)
+        L2 = self.state.get_rhs(f2,pdt2)
+        f2 = 0.75*f0 + 0.25*(f1 + self.dt*L)
+
+        self.state.vals[:,:] = 1./3.*f0 + 2./3.*(f2 + self.dt*L2)
 
     def run(self):
         self.time = 0.0
