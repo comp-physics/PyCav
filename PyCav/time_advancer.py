@@ -87,7 +87,6 @@ class time_advancer:
 
         pdt2 = self.wave.p(self.time+self.dt/2.)
         L2 = self.state.get_rhs(f2,pdt2)
-        f2 = 0.75*f0 + 0.25*(f1 + self.dt*L)
 
         self.state.vals[:,:] = 1./3.*f0 + 2./3.*(f2 + self.dt*L2)
 
