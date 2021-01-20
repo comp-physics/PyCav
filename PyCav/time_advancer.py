@@ -23,6 +23,9 @@ class time_advancer:
         elif self.method == "RK3":
             self.advance = self.rk3
             self.n_stages = 1
+        elif self.method == "RK12":
+            self.advance = self.rk12
+            self.n_stages = 1
         elif self.method == "RK23":
             self.advance = self.rk23
             self.n_stages = 1
@@ -53,7 +56,7 @@ class time_advancer:
             self.error_tol = self.config["error_tol"]
             if self.error_tol <= 0.0:
                 raise ValueError(self.error_tol)
-        elif self.method == "RK23":
+        elif self.method == "RK23" or self.method == "RK12":
             raise Exception("Need error tolerance")
         else:
             self.error_tol = 0.0
@@ -98,6 +101,22 @@ class time_advancer:
 
         self.state.vals[:, :] = 1.0 / 3.0 * f0 + 2.0 / 3.0 * (f2 + self.dt * L2)
 
+    def rk12(self):
+        f0 = self.state.vals.copy()
+
+        p = self.wave.p(self.time)
+        l1 = self.state.get_rhs(f0, p)
+        f1 = f0 + self.dt * l1
+        mome = f1.copy()
+
+        pdt = self.wave.p(self.time + self.dt)
+        L = self.state.get_rhs(f1, pdt)
+
+        mom = 0.5 * f0 + 0.5 * (f1 + self.dt * L)
+
+        self.state.vals[:, :] = mom
+        self.ts_error = np.linalg.norm(mom - mome) / np.linalg.norm(mom)
+
     def rk23(self):
         # SSP-RK2
         f0 = self.state.vals.copy()
@@ -136,7 +155,7 @@ class time_advancer:
         self.save = []
         self.times = []
         self.moms = []
-        np.set_printoptions(precision=24)
+        # np.set_printoptions(precision=24)
 
         while step:
             print("step = ", i_step)
@@ -146,7 +165,7 @@ class time_advancer:
             self.advance()
             i_step += 1
             self.time += self.dt
-            if self.method == "RK23":
+            if self.method == "RK23" or self.method == "RK12":
                 self.adapt_stepsize()
 
             if self.time >= self.T:

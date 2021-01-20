@@ -13,7 +13,7 @@ def inputs():
 
     # Advancer parameters
     # config["advancer"]["method"] = "Euler"
-    config["advancer"]["method"] = "RK23"
+    config["advancer"]["method"] = "RK12"
     config["advancer"]["dt"] = 1.0e-5
     config["advancer"]["T"] = 10
     config["advancer"]["error_tol"] = 1.0e-3

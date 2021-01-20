@@ -7,7 +7,6 @@ import numpy as np
 
 class mc:
     def __init__(self, config=None):
-
         self.adv_config = config["advancer"]
         self.pop_config = config["pop"]
         self.model_config = config["model"]
