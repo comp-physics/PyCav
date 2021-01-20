@@ -10,11 +10,14 @@ class bubble_model:
         self.R0 = R0
         self.parse_config()
 
-        if self.model == "RPE" or self.model == "Linear":
+        if self.model == "RPE" or self.model == "KM" or self.model == "Linear":
             self.num_RV_dim = 2
             self.state = np.array([self.R, self.V])
         else:
             raise NotImplementedError
+
+        if self.model == "KM":
+            self.c = 100.0
 
     def parse_config(self):
         if "model" in self.config:
@@ -65,15 +68,31 @@ class bubble_model:
     def pbw(self):
         self.cpbw = self.Ca * ((self.R0 / self.R) ** (3.0 * self.gamma)) - self.Ca + 1.0
         if self.tension:
-            self.cpbw += (
-                2.0 / (self.Web * self.R0) * (self.R0 / self.R) ** (3.0 * self.gamma)
+            self.cpbw -= (
+                2.0
+                / (self.Web * self.R0)
+                * ((self.R0 / self.R) - (self.R0 / self.R) ** (3.0 * self.gamma))
             )
 
     def rpe(self, p):
         self.pbw()
-        rhs = -1.5 * self.V ** 2.0 + (self.cpbw - p) / self.R
+        rhs = -1.5 * self.V ** 2.0 + (self.cpbw - p)
         if self.viscosity:
-            rhs -= 4.0 * self.Re_inv * self.V / (self.R ** 2.0)
+            rhs -= 4.0 * self.Re_inv * self.V / self.R
+        rhs /= self.R
+        return [self.V, rhs]
+
+    def km(self, p):
+        self.pbw()
+        self.dpdt = 0.0
+        rhs = (
+            (1.0 + self.V / self.c) * (self.cpbw - p)
+            + self.R / self.c * self.dpdt
+            - (1.5 - self.V / (2.0 * self.c)) * self.V ** 2.0
+        )
+        if self.viscosity:
+            rhs -= (1 + self.V / self.c) * 4.0 * self.Re_inv * self.V / self.R
+        rhs /= self.R * (1.0 - self.V / self.c)
         return [self.V, rhs]
 
     def lin(self, p):
@@ -91,6 +110,8 @@ class bubble_model:
         self.update_state()
         if self.model == "RPE":
             rhs = self.rpe(p)
+        elif self.model == "KM":
+            rhs = self.km(p)
         elif self.model == "Linear":
             rhs = self.lin(p)
         else:
@@ -98,7 +119,7 @@ class bubble_model:
         return rhs
 
     def update_state(self):
-        if self.model == "RPE" or self.model == "Linear":
+        if self.model == "RPE" or self.model == "KM" or self.model == "Linear":
             self.R = self.state[0]
             self.V = self.state[1]
         else:
@@ -111,6 +132,8 @@ class bubble_model:
             return np.array(self.rpe(self.p(t)))
         elif self.model == "Linear":
             return np.array(self.lin(self.p(t)))
+        elif self.model == "KM":
+            return np.array(self.km(self.p(t)))
         else:
             raise NotImplementedError
 

@@ -13,17 +13,17 @@ def inputs():
 
     # Advancer parameters
     # config["advancer"]["method"] = "Euler"
-    config["advancer"]["method"] = "RK12"
+    config["advancer"]["method"] = "RK23"
     config["advancer"]["dt"] = 1.0e-5
     config["advancer"]["T"] = 10
     config["advancer"]["error_tol"] = 1.0e-3
 
     # Acoustic
     config["wave"]["amplitude"] = 3
-    config["wave"]["form"] = "sine"
-    # config["wave"]["form"] = "constant"
-    config["wave"]["period"] = 2.0
-    config["wave"]["cycles"] = 2.0
+    # config["wave"]["form"] = "sine"
+    config["wave"]["form"] = "constant"
+    # config["wave"]["period"] = 2.0
+    # config["wave"]["cycles"] = 2.0
 
     # Monte Carlo
     config["mc"]["Nsamples"] = 1000
@@ -38,7 +38,8 @@ def inputs():
     config["pop"]["moments"] = [[0, 0], [1, 0], [0, 1]]
 
     # Bubble properties
-    config["model"]["model"] = "RPE"
+    # config["model"]["model"] = "RPE"
+    config["model"]["model"] = "KM"
     # config["model"]["model"] = "Linear"
     # config["model"]["R"] = 1.0
     config["model"]["V"] = 0.0
