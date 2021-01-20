@@ -10,7 +10,7 @@ class bubble_model:
         self.R0 = R0
         self.parse_config()
 
-        if self.model == "RPE":
+        if self.model == "RPE" or self.model == "Linear":
             self.num_RV_dim = 2
             self.state = np.array([self.R, self.V])
         else:
@@ -76,17 +76,29 @@ class bubble_model:
             rhs -= 4.0 * self.Re_inv * self.V / (self.R ** 2.0)
         return [self.V, rhs]
 
+    def lin(self, p):
+        Cp = (p - 1.0) / 1.0
+        rhs = -1.0 * Cp
+        rhs -= self.R * 3.0 * self.gamma * self.Ca / (self.R0 ** 2.0)
+        if self.viscosity:
+            rhs -= self.V * 4.0 * self.Re_inv / (self.R0 ** 2.0)
+        if self.tension:
+            rhs -= self.V * 2.0 * (3.0 * self.gamma - 1.0) / (self.Web * self.R0 ** 3.0)
+        return [self.V, rhs]
+
     def rhs(self, p):
         # print(self.state)
         self.update_state()
         if self.model == "RPE":
             rhs = self.rpe(p)
+        elif self.model == "Linear":
+            rhs = self.lin(p)
         else:
             raise NotImplementedError
         return rhs
 
     def update_state(self):
-        if self.model == "RPE":
+        if self.model == "RPE" or self.model == "Linear":
             self.R = self.state[0]
             self.V = self.state[1]
         else:
@@ -95,7 +107,12 @@ class bubble_model:
     def wrap(self, t, y):
         self.R = y[0]
         self.V = y[1]
-        return np.array(self.rpe(self.p(t)))
+        if self.model == "RPE":
+            return np.array(self.rpe(self.p(t)))
+        elif self.model == "Linear":
+            return np.array(self.lin(self.p(t)))
+        else:
+            raise NotImplementedError
 
     def solve(self, T=0, Ro=1.0, Vo=0.0, p=1.0, ts=None):
         self.p = p

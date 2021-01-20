@@ -39,6 +39,7 @@ def inputs():
 
     # Bubble properties
     config["model"]["model"] = "RPE"
+    # config["model"]["model"] = "Linear"
     # config["model"]["R"] = 1.0
     config["model"]["V"] = 0.0
     config["model"]["gamma"] = 1.4

@@ -7,8 +7,9 @@
 - [x] Turn pressure from constant to time-dependent function
 * [x] SSP-RK2
 * [x] SSP-RK3
-- [ ] Adaptive Euler/Rk2 or RK23
-- [ ] Linear bubble dynamics 
+* [x] Adaptive Euler/RK2
+- [x] Adaptive RK23
+- [x] Linear bubble dynamics 
 * [ ] Keller Miksis
 
 ## Goals
