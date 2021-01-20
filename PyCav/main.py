@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-import time_advancer as adv
+from time_advancer import time_advancer
 from mc import mc
 
 
@@ -38,8 +38,8 @@ def inputs():
     config["pop"]["moments"] = [[0, 0], [1, 0], [0, 1]]
 
     # Bubble properties
-    # config["model"]["model"] = "RPE"
-    config["model"]["model"] = "KM"
+    config["model"]["model"] = "RPE"
+    # config["model"]["model"] = "KM"
     # config["model"]["model"] = "Linear"
     # config["model"]["R"] = 1.0
     config["model"]["V"] = 0.0
@@ -53,7 +53,7 @@ def inputs():
 
 def advance_classes(config):
 
-    myadv = adv.time_advancer(config=config["advancer"])
+    myadv = time_advancer(config=config["advancer"])
     myadv.initialize_state(pop_config=config["pop"], model_config=config["model"])
     myadv.initialize_wave(wave_config=config["wave"])
     myadv.run()
@@ -62,13 +62,7 @@ def advance_classes(config):
 def advance_mc(config):
 
     mymc = mc(config)
-    sols = mymc.simulate_sample()
-    moments = mymc.state.moment(sols)
-
-    fig, ax = plt.subplots(1, mymc.state.Nmom)
-    for i in range(mymc.state.Nmom):
-        ax[i].plot(sols[i].t, moments[i])
-        ax[i].set(xlabel="$t$", ylabel="$M$" + str(mymc.state.moments[i]))
+    mymc.run()
 
 
 if __name__ == "__main__":

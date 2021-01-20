@@ -3,6 +3,7 @@ import bubble_state as bs
 import time_advancer as adv
 import waveforms as wf
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class mc:
@@ -39,9 +40,19 @@ class mc:
         else:
             raise NotImplementedError
 
-    def simulate_sample(self):
+    def moment(self, sample=[]):
+        ret = np.zeros((self.state.Nmom, self.Nt))
+        for k, mom in enumerate(self.state.moments):
+            if self.state.num_RV_dim == 2:
+                for samp in sample:
+                    ret[k, :] += samp.y[0] ** mom[0] * samp.y[1] ** mom[1]
+            else:
+                raise NotImplementedError
+
+        return ret / self.Nmc
+
+    def run(self):
         T = self.advancer.T
-        # p = self.advancer.p
         p = self.wave.p
         ts = np.linspace(0, T, num=self.Nt)
 
@@ -52,4 +63,8 @@ class mc:
             sol = bubble.solve(T=T, p=p, Ro=R0, Vo=0.0, ts=ts)
             sols.append(sol)
 
-        return sols
+        moments = self.moment(sols)
+        fig, ax = plt.subplots(1, self.state.Nmom)
+        for i in range(self.state.Nmom):
+            ax[i].plot(sols[i].t, moments[i])
+            ax[i].set(xlabel="$t$", ylabel="$M$" + str(self.state.moments[i]))

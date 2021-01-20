@@ -126,29 +126,12 @@ class bubble_state:
         return self.rhs
 
     def get_quad(self):
-        # should be of the same length as the
-        # number of variables (e.g. R,V)
         ret = np.zeros(self.Nmom)
         for k, mom in enumerate(self.moments):
-            # for i in range(self.NR0):
             if self.num_RV_dim == 2:
                 ret[k] = np.sum(
                     self.w[:] * self.vals[:, 0] ** mom[0] * self.vals[:, 1] ** mom[1]
                 )
-        return ret
-
-    def moment(self, sample=[]):
-        Nmc = len(sample)
-        Nt = len(sample[0].y[0])
-        ret = np.zeros((self.Nmom, Nt))
-        for k, mom in enumerate(self.moments):
-            if self.num_RV_dim == 2:
-                for samp in sample:
-                    ret[k, :] += samp.y[0] ** mom[0] * samp.y[1] ** mom[1]
-            else:
-                raise NotImplementedError
-
-        ret = ret / Nmc
         return ret
 
 
