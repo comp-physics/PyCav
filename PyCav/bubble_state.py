@@ -22,6 +22,7 @@ class bubble_state:
                 raise NotImplementedError
         else:
             raise ValueError(self.NR0)
+        self.get_bubbles()
 
         # Assume all bubbles have the same model
         self.num_RV_dim = self.bubble[0].num_RV_dim
@@ -81,6 +82,16 @@ class bubble_state:
         else:
             raise NotImplementedError
 
+
+    def init_GL(self):
+        self.R0 = np.logspace(np.log10(a), np.log10(b), num=self.NR0)
+
+        # get pdf after nodes
+        self.init_pdf()
+
+        self.w = np.zeros(self.NR0)
+        self.w *= self.f
+
     def init_simp(self):
         a = 0.8 * np.exp(-2.8 * self.sigR0)
         b = 0.2 * np.exp(9.5 * self.sigR0) + 1.0
@@ -92,6 +103,7 @@ class bubble_state:
             self.dR0[i] = self.R0[i + 1] - self.R0[i]
         self.dR0[self.NR0 - 1] = self.dR0[self.NR0 - 2]
 
+        # get pdf after nodes
         self.init_pdf()
 
         self.w = np.zeros(self.NR0)
@@ -112,12 +124,14 @@ class bubble_state:
         # plt.xscale("log")
         # plt.show()
 
-        self.bubble = [bm.bubble_model(config=self.model_config, R0=x) for x in self.R0]
 
     def init_mono(self):
         self.w = np.ones(1)
         self.R0 = np.ones(1)
-        self.bubble = [bm.bubble_model(config=self.model_config, R0=1)]
+        # self.bubble = [bm.bubble_model(config=self.model_config, R0=1)]
+
+    def get_bubbles(self):
+        self.bubble = [bm.bubble_model(config=self.model_config, R0=x) for x in self.R0]
 
     def get_rhs(self, state, p):
         self.vals[:, :] = state

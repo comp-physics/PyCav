@@ -1,5 +1,9 @@
 # PyCav
 
+## Objective
+
+* Learn integration technique for computing required statistical moments of the evolving bubble dynamics
+
 ## Todo
 
 - [x] Verify Monte Carlo gets moments right
@@ -10,25 +14,27 @@
 * [x] Adaptive Euler/RK2
 - [x] Adaptive RK23
 - [x] Linear bubble dynamics 
-* [ ] Keller Miksis
+* [x] Keller Miksis
+* [x] Stage 1 complete
+* [ ] Add $dpdt$ to Keller Miksis
+* [ ] Move pressure wave into bubble state module instead of time advancer
+* [ ] Add density into bubble dynamics (since it will be variable in future)
 
-## Goals
+## Development plan
 
 Stage 1:
 * Uncoupled polydisperse bubble cavitation 
   * Modular bubble model (e.g. RPE, KM, etc.)
   * Modular bubble distribution in $R_o$ coordinate (default to log-normal)
-* Python code suitable for ML
-* Learn integration technique for computing required statistical moments of the evolving bubble dynamics
 * Time dependence for bubble forcing (pressure $p(t)$
 * Approximate exact moments via Monte Carlo
 
 Stage 2:
 * One-way coupled dynamics
-  * Has actual pressure waves, spatial dependence, etc.
   * Pressure affects bubble state (radii, void fraction, number density function, etc.)
   * Changing bubble state does not effect time-dependent pressure forcing
   * Use high-class-count to approximate exact solution
 
 Stage 3:
 * Fully-coupled dynamics
+* Spatial dependencies
