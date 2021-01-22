@@ -18,6 +18,8 @@ class bubble_state:
         elif self.NR0 > 1:
             if self.binning == "Simpson":
                 self.init_simp()
+            elif self.binning == "GL":
+                self.init_GL()
             else:
                 raise NotImplementedError
         else:
@@ -84,12 +86,9 @@ class bubble_state:
 
 
     def init_GL(self):
-        self.R0 = np.logspace(np.log10(a), np.log10(b), num=self.NR0)
-
-        # get pdf after nodes
+        # from here: https://numpy.org/doc/stable/reference/generated/numpy.polynomial.legendre.leggauss.html
+        self.R0, self.w = np.polynomial.legendre.leggauss(self.NR0)
         self.init_pdf()
-
-        self.w = np.zeros(self.NR0)
         self.w *= self.f
 
     def init_simp(self):
@@ -118,17 +117,9 @@ class bubble_state:
         self.w *= self.dR0
         self.w *= self.f
 
-        # print(np.sum(self.w))
-        # print(np.sum(self.f*self.dR0))
-        # plt.plot(self.R0,self.f)
-        # plt.xscale("log")
-        # plt.show()
-
-
     def init_mono(self):
         self.w = np.ones(1)
         self.R0 = np.ones(1)
-        # self.bubble = [bm.bubble_model(config=self.model_config, R0=1)]
 
     def get_bubbles(self):
         self.bubble = [bm.bubble_model(config=self.model_config, R0=x) for x in self.R0]
