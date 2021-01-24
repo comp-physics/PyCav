@@ -87,70 +87,72 @@ class bubble_state:
     def init_GH(self):
 
         Npt = self.NR0
-        psmall = 3.e-14
+        psmall = 3.0e-14
         pim4 = 0.7511255444649425
         mxit = 10
 
         phi_tld = np.zeros(Npt)
 
-        m = ( Npt+1 )/2
+        m = (Npt + 1) / 2
 
         for i in range(m):
             if i == 0:
-                z = np.sqrt(2*Npt+1.) - 1.85575*(2*Npt+1)**(-0.16667)
-            elif i==1:
-                z = z - 1.14*(Npt)**0.426/z
-            elif i==2:
-                z = 1.86*z - 0.86*phi_tld(0)
-            elif i==3:
-                z = 1.91*z - 0.91*phi_tld(1)
+                z = np.sqrt(2 * Npt + 1.0) - 1.85575 * (2 * Npt + 1) ** (-0.16667)
+            elif i == 1:
+                z = z - 1.14 * (Npt) ** 0.426 / z
+            elif i == 2:
+                z = 1.86 * z - 0.86 * phi_tld[0]
+            elif i == 3:
+                z = 1.91 * z - 0.91 * phi_tld[1]
             else:
-                z = 2.*z - phi_tld(i-1)
+                z = 2.0 * z - phi_tld[i - 1]
 
-           its = 1
-           while True:
-               if its > mxit or abs(z-z1) <= psmall: 
-                   break
-              p1 = pim4
-              p2 = 0.
-              for j in range(Npt):
-                 p3 = p2
-                 p2 = p1
-                 p1 = z * np.sqrt( 2./float(j+1) ) * p2 \
-                    - np.sqrt( float(j)/float(j+1) ) * p3
-              pp = np.sqrt(2.*Npt)*p2
-              z1 = z
-              z = z1 - p1/pp
-              its+= 1
+            its = 1
+            while True:
+                if its > mxit or abs(z - z1) <= psmall:
+                    break
+                p1 = pim4
+                p2 = 0.0
+                for j in range(Npt):
+                    p3 = p2
+                    p2 = p1
+                    p1 = (
+                        z * np.sqrt(2.0 / float(j + 1)) * p2
+                        - np.sqrt(float(j) / float(j + 1)) * p3
+                    )
+                pp = np.sqrt(2.0 * Npt) * p2
+                z1 = z
+                z = z1 - p1 / pp
+                its += 1
 
-            phi_tld(i) = z
-            phi_tld(Npt-i) = -z
-            weight(i) = 2./(pp**2.)
-            weight(Npt-i) = weight(i)
+            phi_tld[i] = z
+            phi_tld[Npt - i] = -z
+            self.w[i] = 2.0 / (pp ** 2.0)
+            self.w[Npt - i] = self.w[i]
 
-        weight = weight/np.sqrt(pi)
-        R0 = np.exp( np.sqrt(2.)*sd*phi_tld )
+        self.w = self.w / np.sqrt(pi)
+        self.R0 = np.exp(np.sqrt(2.0) * sd * phi_tld)
 
         for i in range(Npt):
-           phi_tld(Npt-i) = R0(i)
-        R0 = phi_tld
+            phi_tld[Npt - i] = self.R0[i]
+        self.R0 = phi_tld
 
     def init_GL(self):
         # from here: https://numpy.org/doc/stable/reference/generated/numpy.polynomial.legendre.leggauss.html
         a = 0.8 * np.exp(-2.8 * self.sigR0)
         b = 0.2 * np.exp(9.5 * self.sigR0) + 1.0
         self.R0, self.w = np.polynomial.legendre.leggauss(self.NR0)
-        self.R0 += 1.
-        self.R0 *= 0.5 * (b-a)
-        self.R0 += a 
+        self.R0 += 1.0
+        self.R0 *= 0.5 * (b - a)
+        self.R0 += a
 
         self.init_pdf()
         self.w *= self.f
         self.w /= np.sum(self.w)
 
-        print('R0',self.R0)
-        print('w',self.w)
-        print('sum',np.sum(self.w))
+        print("R0", self.R0)
+        print("w", self.w)
+        print("sum", np.sum(self.w))
         # exit(0)
 
     def init_simp(self):
@@ -162,8 +164,6 @@ class bubble_state:
         for i in range(self.NR0 - 1):
             self.dR0[i] = self.R0[i + 1] - self.R0[i]
         self.dR0[self.NR0 - 1] = self.dR0[self.NR0 - 2]
-
-
 
         # get pdf after nodes
         self.init_pdf()
@@ -178,13 +178,12 @@ class bubble_state:
                 self.w[i] = 4.0 / 3.0
 
         self.w *= self.dR0
-        self.w *= self.f 
+        self.w *= self.f
         self.w /= np.sum(self.w)
-        
 
-        print('R0',self.R0)
-        print('w',self.w)
-        print('sum',np.sum(self.w))
+        print("R0", self.R0)
+        print("w", self.w)
+        print("sum", np.sum(self.w))
         # exit(0)
 
     def init_mono(self):
