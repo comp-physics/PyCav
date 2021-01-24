@@ -87,20 +87,33 @@ class bubble_state:
 
     def init_GL(self):
         # from here: https://numpy.org/doc/stable/reference/generated/numpy.polynomial.legendre.leggauss.html
+        a = 0.8 * np.exp(-2.8 * self.sigR0)
+        b = 0.2 * np.exp(9.5 * self.sigR0) + 1.0
         self.R0, self.w = np.polynomial.legendre.leggauss(self.NR0)
+        self.R0 += 1.
+        self.R0 *= 0.5 * (b-a)
+        self.R0 += a 
+
         self.init_pdf()
         self.w *= self.f
+        self.w /= np.sum(self.w)
+
+        print('R0',self.R0)
+        print('w',self.w)
+        print('sum',np.sum(self.w))
+        # exit(0)
 
     def init_simp(self):
         a = 0.8 * np.exp(-2.8 * self.sigR0)
         b = 0.2 * np.exp(9.5 * self.sigR0) + 1.0
-        # dR0 = (b-a)/(self.NR0-1.)
         self.R0 = np.logspace(np.log10(a), np.log10(b), num=self.NR0)
 
         self.dR0 = np.zeros(self.NR0)
         for i in range(self.NR0 - 1):
             self.dR0[i] = self.R0[i + 1] - self.R0[i]
         self.dR0[self.NR0 - 1] = self.dR0[self.NR0 - 2]
+
+
 
         # get pdf after nodes
         self.init_pdf()
@@ -115,7 +128,14 @@ class bubble_state:
                 self.w[i] = 4.0 / 3.0
 
         self.w *= self.dR0
-        self.w *= self.f
+        self.w *= self.f 
+        self.w /= np.sum(self.w)
+        
+
+        print('R0',self.R0)
+        print('w',self.w)
+        print('sum',np.sum(self.w))
+        # exit(0)
 
     def init_mono(self):
         self.w = np.ones(1)

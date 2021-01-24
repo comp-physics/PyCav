@@ -32,7 +32,8 @@ def inputs():
     # Population properties
     config["pop"]["NR0"] = 201
     config["pop"]["shape"] = "lognormal"
-    config["pop"]["binning"] = "Simpson"
+    # config["pop"]["binning"] = "Simpson"
+    config["pop"]["binning"] = "GL"
     config["pop"]["muR0"] = 1.0
     config["pop"]["sigR0"] = 0.1
     config["pop"]["moments"] = [[0, 0], [1, 0], [0, 1]]
@@ -73,7 +74,7 @@ if __name__ == "__main__":
     advance_classes(config)
 
     # MC
-    advance_mc(config)
+    # advance_mc(config)
 
     plt.show()
 
