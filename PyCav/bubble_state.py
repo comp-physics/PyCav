@@ -108,6 +108,7 @@ class bubble_state:
                 z = 2.0 * z - phi_tld[i - 1]
 
             its = 1
+            z1 = 0.0
             while True:
                 if its > mxit or abs(z - z1) <= psmall:
                     break
@@ -130,8 +131,8 @@ class bubble_state:
             self.w[i] = 2.0 / (pp ** 2.0)
             self.w[Npt - i] = self.w[i]
 
-        self.w = self.w / np.sqrt(pi)
-        self.R0 = np.exp(np.sqrt(2.0) * sd * phi_tld)
+        self.w = self.w / np.sqrt(np.pi)
+        self.R0 = np.exp(np.sqrt(2.0) * self.sigR0 * phi_tld)
 
         for i in range(Npt):
             phi_tld[Npt - i] = self.R0[i]
