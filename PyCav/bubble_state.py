@@ -84,6 +84,56 @@ class bubble_state:
         else:
             raise NotImplementedError
 
+    def init_GH(self):
+
+        Npt = self.NR0
+        psmall = 3.e-14
+        pim4 = 0.7511255444649425
+        mxit = 10
+
+        phi_tld = np.zeros(Npt)
+
+        m = ( Npt+1 )/2
+
+        for i in range(m):
+            if i == 0:
+                z = np.sqrt(2*Npt+1.) - 1.85575*(2*Npt+1)**(-0.16667)
+            elif i==1:
+                z = z - 1.14*(Npt)**0.426/z
+            elif i==2:
+                z = 1.86*z - 0.86*phi_tld(0)
+            elif i==3:
+                z = 1.91*z - 0.91*phi_tld(1)
+            else:
+                z = 2.*z - phi_tld(i-1)
+
+           its = 1
+           while True:
+               if its > mxit or abs(z-z1) <= psmall: 
+                   break
+              p1 = pim4
+              p2 = 0.
+              for j in range(Npt):
+                 p3 = p2
+                 p2 = p1
+                 p1 = z * np.sqrt( 2./float(j+1) ) * p2 \
+                    - np.sqrt( float(j)/float(j+1) ) * p3
+              pp = np.sqrt(2.*Npt)*p2
+              z1 = z
+              z = z1 - p1/pp
+              its+= 1
+
+            phi_tld(i) = z
+            phi_tld(Npt-i) = -z
+            weight(i) = 2./(pp**2.)
+            weight(Npt-i) = weight(i)
+
+        weight = weight/np.sqrt(pi)
+        R0 = np.exp( np.sqrt(2.)*sd*phi_tld )
+
+        for i in range(Npt):
+           phi_tld(Npt-i) = R0(i)
+        R0 = phi_tld
 
     def init_GL(self):
         # from here: https://numpy.org/doc/stable/reference/generated/numpy.polynomial.legendre.leggauss.html
