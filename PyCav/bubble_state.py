@@ -21,6 +21,8 @@ class bubble_state:
             elif self.binning == "GL":
                 self.init_GL()
             elif self.binning == "GH":
+                if self.shape != "lognormal":
+                    raise NotImplementedError
                 self.init_GH()
             else:
                 raise NotImplementedError
@@ -87,6 +89,11 @@ class bubble_state:
             raise NotImplementedError
 
     def init_GH(self):
+        """
+        Routine for Gauss-Hermite abscissas and weights (Numerical Recipe)
+        Roots are symmetric about the origin, then find only half of them
+        Translated from Keita Ando Fortran bubbly flow code (c. 2010)
+        """
 
         Npt = self.NR0
         psmall = 3.0e-14
@@ -133,7 +140,7 @@ class bubble_state:
             self.w[i] = 2.0 / (pp ** 2.0)
             self.w[Npt - i - 1] = self.w[i]
 
-        self.w = self.w / np.sqrt(np.pi)
+        self.w /= np.sqrt(np.pi)
         self.R0 = np.exp(np.sqrt(2.0) * self.sigR0 * phi_tld)
 
         for i in range(Npt):

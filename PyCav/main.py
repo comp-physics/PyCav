@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 from time_advancer import time_advancer
 from mc import mc
-
+import warnings
+warnings.simplefilter('error')
 
 def inputs():
     config = {}
@@ -32,8 +33,8 @@ def inputs():
     # Population properties
     config["pop"]["NR0"] = 201
     config["pop"]["shape"] = "lognormal"
-    config["pop"]["binning"] = "Simpson"
-    # config["pop"]["binning"] = "GH"
+    # config["pop"]["binning"] = "Simpson"
+    config["pop"]["binning"] = "GH"
     config["pop"]["muR0"] = 1.0
     config["pop"]["sigR0"] = 0.3
     config["pop"]["moments"] = [[0, 0], [1, 0], [0, 1]]
