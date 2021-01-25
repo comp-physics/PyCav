@@ -20,6 +20,8 @@ class bubble_state:
                 self.init_simp()
             elif self.binning == "GL":
                 self.init_GL()
+            elif self.binning == "GH":
+                self.init_GH()
             else:
                 raise NotImplementedError
         else:
@@ -88,31 +90,31 @@ class bubble_state:
 
         Npt = self.NR0
         psmall = 3.0e-14
-        pim4 = 0.7511255444649425
-        mxit = 10
+        mxit = 100
 
         phi_tld = np.zeros(Npt)
+        self.w = np.zeros(Npt)
 
-        m = (Npt + 1) / 2
+        m = (Npt + 1) // 2
 
         for i in range(m):
             if i == 0:
                 z = np.sqrt(2 * Npt + 1.0) - 1.85575 * (2 * Npt + 1) ** (-0.16667)
             elif i == 1:
-                z = z - 1.14 * (Npt) ** 0.426 / z
+                z = z - 1.14 * Npt ** 0.426 / z
             elif i == 2:
                 z = 1.86 * z - 0.86 * phi_tld[0]
             elif i == 3:
                 z = 1.91 * z - 0.91 * phi_tld[1]
             else:
-                z = 2.0 * z - phi_tld[i - 1]
+                z = 2.0 * z - phi_tld[i - 2]
 
             its = 1
             z1 = 0.0
             while True:
                 if its > mxit or abs(z - z1) <= psmall:
                     break
-                p1 = pim4
+                p1 = np.pi ** (-0.25)
                 p2 = 0.0
                 for j in range(Npt):
                     p3 = p2
@@ -127,16 +129,20 @@ class bubble_state:
                 its += 1
 
             phi_tld[i] = z
-            phi_tld[Npt - i] = -z
+            phi_tld[Npt - i - 1] = -z
             self.w[i] = 2.0 / (pp ** 2.0)
-            self.w[Npt - i] = self.w[i]
+            self.w[Npt - i - 1] = self.w[i]
 
         self.w = self.w / np.sqrt(np.pi)
         self.R0 = np.exp(np.sqrt(2.0) * self.sigR0 * phi_tld)
 
         for i in range(Npt):
-            phi_tld[Npt - i] = self.R0[i]
+            phi_tld[Npt - i - 1] = self.R0[i]
         self.R0 = phi_tld
+
+        print(self.R0)
+        print(self.w)
+        # exit()
 
     def init_GL(self):
         # from here: https://numpy.org/doc/stable/reference/generated/numpy.polynomial.legendre.leggauss.html
