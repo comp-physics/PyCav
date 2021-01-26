@@ -16,9 +16,7 @@
 - [x] Linear bubble dynamics 
 * [x] Keller Miksis
 * [x] Stage 1 complete
-* [ ] Add $dpdt$ to Keller Miksis
-* [ ] Move pressure wave into bubble state module instead of time advancer
-* [ ] Add density into bubble dynamics (since it will be variable in future)
+* [x] Add $dpdt$ to Keller Miksis
 
 ## Development plan
 

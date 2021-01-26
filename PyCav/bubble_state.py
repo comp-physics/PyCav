@@ -28,6 +28,11 @@ class bubble_state:
                 raise NotImplementedError
         else:
             raise ValueError(self.NR0)
+
+        # print("R0", self.R0)
+        # print("w", self.w)
+        # print("sum", np.sum(self.w))
+
         self.get_bubbles()
 
         # Assume all bubbles have the same model
@@ -47,7 +52,6 @@ class bubble_state:
         self.rhs = np.zeros((self.NR0, self.num_RV_dim))
 
     def parse_config(self):
-
         if "NR0" in self.pop_config:
             self.NR0 = self.pop_config["NR0"]
         else:
@@ -147,10 +151,6 @@ class bubble_state:
             phi_tld[Npt - i - 1] = self.R0[i]
         self.R0 = phi_tld
 
-        print(self.R0)
-        print(self.w)
-        # exit()
-
     def init_GL(self):
         # from here: https://numpy.org/doc/stable/reference/generated/numpy.polynomial.legendre.leggauss.html
         a = 0.8 * np.exp(-2.8 * self.sigR0)
@@ -164,11 +164,6 @@ class bubble_state:
         self.w *= self.f
         self.w /= np.sum(self.w)
 
-        print("R0", self.R0)
-        print("w", self.w)
-        print("sum", np.sum(self.w))
-        # exit(0)
-
     def init_simp(self):
         a = 0.8 * np.exp(-2.8 * self.sigR0)
         b = 0.2 * np.exp(9.5 * self.sigR0) + 1.0
@@ -179,7 +174,6 @@ class bubble_state:
             self.dR0[i] = self.R0[i + 1] - self.R0[i]
         self.dR0[self.NR0 - 1] = self.dR0[self.NR0 - 2]
 
-        # get pdf after nodes
         self.init_pdf()
 
         self.w = np.zeros(self.NR0)
@@ -194,11 +188,6 @@ class bubble_state:
         self.w *= self.dR0
         self.w *= self.f
         self.w /= np.sum(self.w)
-
-        print("R0", self.R0)
-        print("w", self.w)
-        print("sum", np.sum(self.w))
-        # exit(0)
 
     def init_mono(self):
         self.w = np.ones(1)

@@ -16,7 +16,7 @@ def inputs():
     # config["advancer"]["method"] = "Euler"
     config["advancer"]["method"] = "RK23"
     config["advancer"]["dt"] = 1.0e-5
-    config["advancer"]["T"] = 10
+    config["advancer"]["T"] = 50
     config["advancer"]["error_tol"] = 1.0e-3
 
     # Acoustic
@@ -31,10 +31,10 @@ def inputs():
     config["mc"]["Ntimes"] = 100
 
     # Population properties
-    config["pop"]["NR0"] = 201
+    config["pop"]["NR0"] = 401
     config["pop"]["shape"] = "lognormal"
-    # config["pop"]["binning"] = "Simpson"
-    config["pop"]["binning"] = "GH"
+    config["pop"]["binning"] = "Simpson"
+    # config["pop"]["binning"] = "GH"
     config["pop"]["muR0"] = 1.0
     config["pop"]["sigR0"] = 0.3
     config["pop"]["moments"] = [[0, 0], [1, 0], [0, 1]]
@@ -46,6 +46,7 @@ def inputs():
     # config["model"]["R"] = 1.0
     config["model"]["V"] = 0.0
     config["model"]["gamma"] = 1.4
+    config["model"]["c"] = 1000.
     # config["model"]["Ca"] = 0.5
     # config["model"]["Re_inv"] = 0.001
     # config["model"]["Web"] = 10.

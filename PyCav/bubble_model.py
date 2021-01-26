@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.integrate as sp
 import matplotlib.pyplot as plt
+from sys import exit
 
 
 class bubble_model:
@@ -15,9 +16,6 @@ class bubble_model:
             self.state = np.array([self.R, self.V])
         else:
             raise NotImplementedError
-
-        if self.model == "KM":
-            self.c = 100.0
 
     def parse_config(self):
         if "model" in self.config:
@@ -65,7 +63,15 @@ class bubble_model:
             self.tension = False
             self.Web = 0
 
-    def pbw(self):
+
+        if "c" in self.config:
+            self.c = self.config["c"]
+        elif self.model == "KM":
+            raise Exception("need c")
+        else:
+            self.c = 0.0
+
+    def get_cpbw(self):
         self.cpbw = self.Ca * ((self.R0 / self.R) ** (3.0 * self.gamma)) - self.Ca + 1.0
         if self.tension:
             self.cpbw -= (
@@ -74,29 +80,56 @@ class bubble_model:
                 * ((self.R0 / self.R) - (self.R0 / self.R) ** (3.0 * self.gamma))
             )
 
+    def get_dpbdt(self):
+        self.dpbdt = -3.0 * self.gamma * self.Ca * self.R0 * self.V \
+                * ( self.R0 / self.R ) ** (3.0 * self.gamma - 1.0) \
+                / self.R ** 2.0
+        if self.tension:
+            self.dpbdt += ( 2.0 * self.V / (self.R0 * self.Web * self.R ** 2.0) 
+                        * ( self.R0 
+                        - 3.0 * self.gamma * self.R * (self.R0 / self.R) ** ( 3.0 * self.gamma )
+                        )
+                    )
+        if self.viscosity:
+            self.dpbdt += 4.0 * self.Re_inv * ( self.V / self.R ) ** 2.0 
+
+    def km(self, p):
+        pressure = p[0]
+        dpdt = p[1]
+        self.get_cpbw()
+        self.get_dpbdt()
+        dpwdt = self.dpbdt - dpdt
+        # dpwdt = 0.0
+
+        rhs = (
+            (1.0 + self.V / self.c) * (self.cpbw - pressure)
+            + self.R / self.c * dpwdt
+            - (1.5 - self.V / (2.0 * self.c)) * self.V ** 2.0
+        )
+
+        if self.viscosity:
+            # associated with LHS
+            rhs -= (1 + self.V / self.c) * 4.0 * self.Re_inv * self.V / self.R
+            # associated with LHS (top) and dpbwdt in RHS (bottom)
+            rhs /= ( self.R * (1.0 - self.V / self.c) 
+                    + 4.0 * self.Re_inv / self.c )
+        else:
+            rhs /= ( self.R * (1.0 - self.V / self.c) )
+
+        return [self.V, rhs]
+
     def rpe(self, p):
-        self.pbw()
-        rhs = -1.5 * self.V ** 2.0 + (self.cpbw - p)
+        pressure = p[0]
+        self.get_cpbw()
+        rhs = -1.5 * self.V ** 2.0 + (self.cpbw - pressure)
         if self.viscosity:
             rhs -= 4.0 * self.Re_inv * self.V / self.R
         rhs /= self.R
         return [self.V, rhs]
 
-    def km(self, p):
-        self.pbw()
-        self.dpdt = 0.0
-        rhs = (
-            (1.0 + self.V / self.c) * (self.cpbw - p)
-            + self.R / self.c * self.dpdt
-            - (1.5 - self.V / (2.0 * self.c)) * self.V ** 2.0
-        )
-        if self.viscosity:
-            rhs -= (1 + self.V / self.c) * 4.0 * self.Re_inv * self.V / self.R
-        rhs /= self.R * (1.0 - self.V / self.c)
-        return [self.V, rhs]
-
     def lin(self, p):
-        Cp = (p - 1.0) / 1.0
+        pressure = p[0]
+        Cp = (pressure - 1.0) / 1.0
         rhs = -1.0 * Cp
         rhs -= self.R * 3.0 * self.gamma * self.Ca / (self.R0 ** 2.0)
         if self.viscosity:
@@ -130,10 +163,10 @@ class bubble_model:
         self.V = y[1]
         if self.model == "RPE":
             return np.array(self.rpe(self.p(t)))
-        elif self.model == "Linear":
-            return np.array(self.lin(self.p(t)))
         elif self.model == "KM":
             return np.array(self.km(self.p(t)))
+        elif self.model == "Linear":
+            return np.array(self.lin(self.p(t)))
         else:
             raise NotImplementedError
 
