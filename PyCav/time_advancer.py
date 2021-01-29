@@ -149,7 +149,6 @@ class time_advancer:
             max(0.9 * new_time_step, self.min_time_step), self.max_time_step
         )
         self.dt = new_time_step
-        print("ts ratio = ", self.dt / self.min_time_step)
 
     def run(self):
         self.time = 0.0
@@ -161,7 +160,7 @@ class time_advancer:
         # np.set_printoptions(precision=24)
 
         while step:
-            print("step = ", i_step)
+            print("step = ", i_step, "ratio", round(self.dt / self.min_time_step,2))
             self.times.append(self.time)
             self.save.append(self.state.vals.copy())
             self.moms.append(self.state.get_quad())

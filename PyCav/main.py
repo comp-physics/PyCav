@@ -31,25 +31,26 @@ def inputs():
     config["mc"]["Ntimes"] = 100
 
     # Population properties
-    config["pop"]["NR0"] = 401
+    config["pop"]["NR0"] = 501
     config["pop"]["shape"] = "lognormal"
     config["pop"]["binning"] = "Simpson"
     # config["pop"]["binning"] = "GH"
     config["pop"]["muR0"] = 1.0
     config["pop"]["sigR0"] = 0.3
-    config["pop"]["moments"] = [[0, 0], [1, 0], [0, 1]]
+    config["pop"]["moments"] = [ [0, 0], [1, 0], [0, 1] ]
+    # config["pop"]["moments"] = [ [3, 2], [2, 1], [3, 0], [ 3*(1-1.4), 0, 3*1.4 ] ]
 
     # Bubble properties
-    config["model"]["model"] = "RPE"
-    # config["model"]["model"] = "KM"
+    # config["model"]["model"] = "RPE"
+    config["model"]["model"] = "KM"
     # config["model"]["model"] = "Linear"
     # config["model"]["R"] = 1.0
     config["model"]["V"] = 0.0
     config["model"]["gamma"] = 1.4
     config["model"]["c"] = 1000.
     # config["model"]["Ca"] = 0.5
-    # config["model"]["Re_inv"] = 0.001
-    # config["model"]["Web"] = 10.
+    config["model"]["Re_inv"] = 1/100.
+    config["model"]["Web"] = 13.9
 
     return config
 

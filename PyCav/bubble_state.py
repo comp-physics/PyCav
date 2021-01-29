@@ -38,9 +38,9 @@ class bubble_state:
         # Assume all bubbles have the same model
         self.num_RV_dim = self.bubble[0].num_RV_dim
 
-        for mom in self.moments:
-            if len(mom) != self.num_RV_dim:
-                raise ValueError(mom, self.num_RV_dim)
+        # for mom in self.moments:
+        #     if len(mom) != self.num_RV_dim:
+        #         raise ValueError(mom, self.num_RV_dim)
 
         self.vals = np.zeros((self.NR0, self.num_RV_dim))
         for i in range(self.NR0):
@@ -205,10 +205,19 @@ class bubble_state:
     def get_quad(self):
         ret = np.zeros(self.Nmom)
         for k, mom in enumerate(self.moments):
-            if self.num_RV_dim == 2:
+            if self.num_RV_dim == 2 and len(mom) == 2:
                 ret[k] = np.sum(
-                    self.w[:] * self.vals[:, 0] ** mom[0] * self.vals[:, 1] ** mom[1]
+                    self.w[:] * self.vals[:, 0] ** mom[0] * \
+                                self.vals[:, 1] ** mom[1]
                 )
+            elif self.num_RV_dim == 2 and len(mom) == 3:
+                ret[k] = np.sum(
+                        self.w[:] * self.vals[:, 0] ** mom[0] * \
+                                    self.vals[:, 1] ** mom[1] * \
+                                    self.R0[:] ** mom[2]
+                )
+            else:
+                raise Exception
         return ret
 
 
