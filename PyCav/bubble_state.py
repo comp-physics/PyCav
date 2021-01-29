@@ -202,24 +202,53 @@ class bubble_state:
             self.rhs[i, :] = self.bubble[i].rhs(p)
         return self.rhs
 
-    def get_quad(self):
+    def get_quad(self,vals=None,Nfilt=0):
         ret = np.zeros(self.Nmom)
-        for k, mom in enumerate(self.moments):
-            if self.num_RV_dim == 2 and len(mom) == 2:
-                ret[k] = np.sum(
-                    self.w[:] * self.vals[:, 0] ** mom[0] * \
-                                self.vals[:, 1] ** mom[1]
-                )
-            elif self.num_RV_dim == 2 and len(mom) == 3:
-                ret[k] = np.sum(
-                        self.w[:] * self.vals[:, 0] ** mom[0] * \
-                                    self.vals[:, 1] ** mom[1] * \
-                                    self.R0[:] ** mom[2]
-                )
-            else:
-                raise Exception
+        if Nfilt == 0:
+            for k, mom in enumerate(self.moments):
+                if self.num_RV_dim == 2 and len(mom) == 2:
+                    ret[k] = np.sum(
+                        self.w[:] * vals[:, 0] ** mom[0] * \
+                                    vals[:, 1] ** mom[1])
+                elif self.num_RV_dim == 2 and len(mom) == 3:
+                    ret[k] = np.sum(
+                            self.w[:] * vals[:, 0] ** mom[0] * \
+                                        vals[:, 1] ** mom[1] * \
+                                        self.R0[:] ** mom[2])
+                else:
+                    raise Exception
+        else:
+            for k, mom in enumerate(self.moments):
+                if self.num_RV_dim == 2 and len(mom) == 2:
+                    G = np.zeros(self.NR0)
+                    for q in range(Nfilt):
+                        G += (
+                            vals[q, :, 0] ** mom[0] *
+                            vals[q, :, 1] ** mom[1])
+                    G /= float(Nfilt)
+                    ret[k] = np.sum(self.w[:] * G[:])
+                else:
+                    raise Exception
+            
         return ret
 
+    # def get_quad(self):
+    #     ret = np.zeros(self.Nmom)
+    #     for k, mom in enumerate(self.moments):
+    #         if self.num_RV_dim == 2 and len(mom) == 2:
+    #             ret[k] = np.sum(
+    #                 self.w[:] * self.vals[:, 0] ** mom[0] * \
+    #                             self.vals[:, 1] ** mom[1]
+    #             )
+    #         elif self.num_RV_dim == 2 and len(mom) == 3:
+    #             ret[k] = np.sum(
+    #                     self.w[:] * self.vals[:, 0] ** mom[0] * \
+    #                                 self.vals[:, 1] ** mom[1] * \
+    #                                 self.R0[:] ** mom[2]
+    #             )
+    #         else:
+    #             raise Exception
+    #     return ret
 
 if __name__ == "__main__":
 

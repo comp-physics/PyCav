@@ -16,14 +16,15 @@ def inputs():
     # config["advancer"]["method"] = "Euler"
     config["advancer"]["method"] = "RK23"
     config["advancer"]["dt"] = 1.0e-5
-    config["advancer"]["T"] = 50
+    config["advancer"]["T"] = 40
     config["advancer"]["error_tol"] = 1.0e-3
+    config["advancer"]["Nfilt"] = 1
 
     # Acoustic
     config["wave"]["amplitude"] = 3
-    # config["wave"]["form"] = "sine"
-    config["wave"]["form"] = "constant"
-    # config["wave"]["period"] = 2.0
+    config["wave"]["form"] = "sine"
+    # config["wave"]["form"] = "constant"
+    # config["wave"]["period"] = 4.0
     # config["wave"]["cycles"] = 2.0
 
     # Monte Carlo
@@ -37,20 +38,21 @@ def inputs():
     # config["pop"]["binning"] = "GH"
     config["pop"]["muR0"] = 1.0
     config["pop"]["sigR0"] = 0.3
-    config["pop"]["moments"] = [ [0, 0], [1, 0], [0, 1] ]
+    config["pop"]["moments"] = [ [1, 0], [0, 1], [1, 1] ]
     # config["pop"]["moments"] = [ [3, 2], [2, 1], [3, 0], [ 3*(1-1.4), 0, 3*1.4 ] ]
 
+
     # Bubble properties
-    # config["model"]["model"] = "RPE"
-    config["model"]["model"] = "KM"
+    config["model"]["model"] = "RPE"
+    # config["model"]["model"] = "KM"
     # config["model"]["model"] = "Linear"
     # config["model"]["R"] = 1.0
     config["model"]["V"] = 0.0
     config["model"]["gamma"] = 1.4
-    config["model"]["c"] = 1000.
+    # config["model"]["c"] = 1000.
     # config["model"]["Ca"] = 0.5
-    config["model"]["Re_inv"] = 1/100.
-    config["model"]["Web"] = 13.9
+    # config["model"]["Re_inv"] = 1/100.
+    # config["model"]["Web"] = 13.9
 
     return config
 
@@ -73,12 +75,16 @@ if __name__ == "__main__":
 
     config = inputs()
 
-    # Classes
+    config["pop"]["NR0"] = 501
+    config["advancer"]["Nfilt"] = 0
     advance_classes(config)
-
-    # MC
+    config["pop"]["NR0"] = 101
+    config["advancer"]["Nfilt"] = 0
+    advance_classes(config)
+    config["pop"]["NR0"] = 101
+    config["advancer"]["Nfilt"] = 40
+    advance_classes(config)
     # advance_mc(config)
 
     plt.show()
-
     # plt.savefig('out.pdf')

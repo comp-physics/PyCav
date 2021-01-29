@@ -61,6 +61,13 @@ class time_advancer:
         else:
             self.error_tol = 0.0
 
+        if "Nfilt" in self.config:
+            self.filter = True
+            self.Nfilt = self.config["Nfilt"]
+        else:
+            self.filter = False
+            self.Nfilt = 0
+
     def initialize_state(self, pop_config=None, model_config=None):
         self.state = bs.bubble_state(pop_config=pop_config, model_config=model_config)
 
@@ -156,14 +163,16 @@ class time_advancer:
         step = True
         self.save = []
         self.times = []
-        self.moms = []
         # np.set_printoptions(precision=24)
 
         while step:
-            print("step = ", i_step, "ratio", round(self.dt / self.min_time_step,2))
+            print(
+                    "Step: ", i_step, 
+                    "     TS Ratio:", round(self.dt / self.min_time_step,2), 
+                    "     Percent completed:", round(100*self.time/self.T,1)
+                )
             self.times.append(self.time)
             self.save.append(self.state.vals.copy())
-            self.moms.append(self.state.get_quad())
             self.advance()
             i_step += 1
             self.time += self.dt
@@ -174,7 +183,19 @@ class time_advancer:
                 step = False
 
         self.save = np.array(self.save, dtype=np.float32)
-        self.moms = np.array(self.moms, dtype=np.float32)
+
+        Nt = len(self.times)
+        self.moms = np.zeros([Nt,self.state.Nmom])
+        if self.filter: 
+            for j in range(Nt):
+                jMin = max(j-self.Nfilt,0)
+                self.moms[j,:] = self.state.get_quad(
+                        vals=self.save[jMin:j+1],
+                        Nfilt=j+1-jMin)
+        else:
+            for j, vals in enumerate(self.save):
+                self.moms[j,:] = self.state.get_quad(vals=vals)
+
         self.plot()
 
     def plot(self):
