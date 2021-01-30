@@ -232,23 +232,6 @@ class bubble_state:
             
         return ret
 
-    # def get_quad(self):
-    #     ret = np.zeros(self.Nmom)
-    #     for k, mom in enumerate(self.moments):
-    #         if self.num_RV_dim == 2 and len(mom) == 2:
-    #             ret[k] = np.sum(
-    #                 self.w[:] * self.vals[:, 0] ** mom[0] * \
-    #                             self.vals[:, 1] ** mom[1]
-    #             )
-    #         elif self.num_RV_dim == 2 and len(mom) == 3:
-    #             ret[k] = np.sum(
-    #                     self.w[:] * self.vals[:, 0] ** mom[0] * \
-    #                                 self.vals[:, 1] ** mom[1] * \
-    #                                 self.R0[:] ** mom[2]
-    #             )
-    #         else:
-    #             raise Exception
-    #     return ret
 
 if __name__ == "__main__":
 

@@ -165,6 +165,8 @@ class time_advancer:
         self.times = []
         # np.set_printoptions(precision=24)
 
+        # plt.ion()
+
         while step:
             print(
                     "Step: ", i_step, 
@@ -176,6 +178,15 @@ class time_advancer:
             self.advance()
             i_step += 1
             self.time += self.dt
+
+            # if i_step % 100 == 0:
+                # plt.plot(self.state.R0, self.state.vals[:,0])
+                # plt.plot(self.state.R0, self.state.vals[:,1])
+                # plt.xscale('log')
+                # plt.draw()
+                # plt.pause(1e-5)
+                # plt.clf()
+
             if self.method == "RK23" or self.method == "RK12":
                 self.adapt_stepsize()
 
@@ -184,19 +195,22 @@ class time_advancer:
 
         self.save = np.array(self.save, dtype=np.float32)
 
-        Nt = len(self.times)
-        self.moms = np.zeros([Nt,self.state.Nmom])
-        if self.filter: 
-            for j in range(Nt):
-                jMin = max(j-self.Nfilt,0)
-                self.moms[j,:] = self.state.get_quad(
-                        vals=self.save[jMin:j+1],
-                        Nfilt=j+1-jMin)
-        else:
-            for j, vals in enumerate(self.save):
-                self.moms[j,:] = self.state.get_quad(vals=vals)
+        return self
+        # return [ self.times, self.save, self.state.R0 ]
 
-        self.plot()
+        # Nt = len(self.times)
+        # self.moms = np.zeros([Nt,self.state.Nmom])
+        # if self.filter: 
+        #     for j in range(Nt):
+        #         jMin = max(j-self.Nfilt,0)
+        #         self.moms[j,:] = self.state.get_quad(
+        #                 vals=self.save[jMin:j+1],
+        #                 Nfilt=j+1-jMin)
+        # else:
+        #     for j, vals in enumerate(self.save):
+        #         self.moms[j,:] = self.state.get_quad(vals=vals)
+
+        # self.plot()
 
     def plot(self):
         # plot R evolution for all quad points
@@ -207,11 +221,20 @@ class time_advancer:
         # plt.ylabel("$R(t)$")
         # plt.show()
 
-        fig, ax = plt.subplots(1, self.state.Nmom)
-        for i in range(self.state.Nmom):
-            ax[i].plot(self.times, self.moms[:, i])
-            ax[i].set(xlabel="$t$", ylabel="$M$" + str(self.state.moments[i]))
-        plt.tight_layout()
+        plt.plot(
+                self.times, 
+                self.moms[:,0], 
+                label="NR0 = " + str(self.state.NR0) + " Nfilt = " + str(self.Nfilt)
+                )
+        plt.xlabel("$t$")
+        plt.ylabel("$M$" + str(self.state.moments[0]))
+        plt.legend(loc="upper right")
+
+        # fig, ax = plt.subplots(1, self.state.Nmom)
+        # for i in range(self.state.Nmom):
+        #     ax[i].plot(self.times, self.moms[:, i])
+        #     ax[i].set(xlabel="$t$", ylabel="$M$" + str(self.state.moments[i]))
+        # plt.tight_layout()
 
 
 if __name__ == "__main__":
