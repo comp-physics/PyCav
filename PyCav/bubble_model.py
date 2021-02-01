@@ -63,7 +63,6 @@ class bubble_model:
             self.tension = False
             self.Web = 0
 
-
         if "c" in self.config:
             self.c = self.config["c"]
         elif self.model == "KM":
@@ -81,17 +80,30 @@ class bubble_model:
             )
 
     def get_dpbdt(self):
-        self.dpbdt = -3.0 * self.gamma * self.Ca * self.R0 * self.V \
-                * ( self.R0 / self.R ) ** (3.0 * self.gamma - 1.0) \
-                / self.R ** 2.0
+        self.dpbdt = (
+            -3.0
+            * self.gamma
+            * self.Ca
+            * self.R0
+            * self.V
+            * (self.R0 / self.R) ** (3.0 * self.gamma - 1.0)
+            / self.R ** 2.0
+        )
         if self.tension:
-            self.dpbdt += ( 2.0 * self.V / (self.R0 * self.Web * self.R ** 2.0) 
-                        * ( self.R0 
-                        - 3.0 * self.gamma * self.R * (self.R0 / self.R) ** ( 3.0 * self.gamma )
-                        )
-                    )
+            self.dpbdt += (
+                2.0
+                * self.V
+                / (self.R0 * self.Web * self.R ** 2.0)
+                * (
+                    self.R0
+                    - 3.0
+                    * self.gamma
+                    * self.R
+                    * (self.R0 / self.R) ** (3.0 * self.gamma)
+                )
+            )
         if self.viscosity:
-            self.dpbdt += 4.0 * self.Re_inv * ( self.V / self.R ) ** 2.0 
+            self.dpbdt += 4.0 * self.Re_inv * (self.V / self.R) ** 2.0
 
     def km(self, p):
         pressure = p[0]
@@ -111,10 +123,9 @@ class bubble_model:
             # associated with LHS
             rhs -= (1 + self.V / self.c) * 4.0 * self.Re_inv * self.V / self.R
             # associated with LHS (top) and dpbwdt in RHS (bottom)
-            rhs /= ( self.R * (1.0 - self.V / self.c) 
-                    + 4.0 * self.Re_inv / self.c )
+            rhs /= self.R * (1.0 - self.V / self.c) + 4.0 * self.Re_inv / self.c
         else:
-            rhs /= ( self.R * (1.0 - self.V / self.c) )
+            rhs /= self.R * (1.0 - self.V / self.c)
 
         return [self.V, rhs]
 

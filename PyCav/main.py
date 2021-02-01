@@ -3,8 +3,10 @@ from time_advancer import time_advancer
 from mc import mc
 from moments import get_moments
 import warnings
-warnings.simplefilter('error')
 from sys import exit
+
+warnings.simplefilter("error")
+
 
 def inputs():
     config = {}
@@ -40,9 +42,8 @@ def inputs():
     # config["pop"]["binning"] = "GH"
     config["pop"]["muR0"] = 1.0
     config["pop"]["sigR0"] = 0.3
-    config["pop"]["moments"] = [ [1, 0], [0, 1], [1, 1] ]
+    config["pop"]["moments"] = [[1, 0], [0, 1], [1, 1]]
     # config["pop"]["moments"] = [ [3, 2], [2, 1], [3, 0], [ 3*(1-1.4), 0, 3*1.4 ] ]
-
 
     # Bubble properties
     config["model"]["model"] = "RPE"
@@ -110,8 +111,8 @@ if __name__ == "__main__":
         for i in range(sol.state.Nmom):
             ax[i].plot(
                 sol.times,
-                sol.moms[:,i],
-                label="NR0 = " + str(sol.state.NR0) + " Nfilt = " + str(sol.Nfilt)
+                sol.moms[:, i],
+                label="NR0 = " + str(sol.state.NR0) + " Nfilt = " + str(sol.Nfilt),
             )
             ax[i].set(xlabel="$t$", ylabel="$M$" + str(sol.state.moments[i]))
             ax[i].legend(loc="upper right")
@@ -119,7 +120,6 @@ if __name__ == "__main__":
     plt.tight_layout()
     plt.show()
 
-        
     # advance_mc(config)
 
     # plt.savefig('out.pdf')

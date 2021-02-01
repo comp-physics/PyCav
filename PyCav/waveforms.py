@@ -45,18 +45,17 @@ class waveforms:
             self.ambient = 1.0
 
     def p_constant(self, t):
-        return [ self.amplitude, 0.0 ]
+        return [self.amplitude, 0.0]
 
     def p_sine(self, t):
         if t <= self.period * self.cycles:
             f = 2.0 * np.pi / self.period
-            return [ self.amplitude * np.sin(f * t), \
-                   self.amplitude * np.cos(f * t) * f ]
+            return [self.amplitude * np.sin(f * t), self.amplitude * np.cos(f * t) * f]
         else:
-            return [ self.ambient, 0.0 ] 
+            return [self.ambient, 0.0]
 
     def p_square(self, t):
         if t <= self.period:
-            return [ self.amplitude, 0.0 ]
+            return [self.amplitude, 0.0]
         else:
-            return [ self.ambient, 0.0 ]
+            return [self.ambient, 0.0]

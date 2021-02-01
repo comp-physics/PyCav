@@ -169,10 +169,13 @@ class time_advancer:
 
         while step:
             print(
-                    "Step: ", i_step, 
-                    "TS Ratio:", round(self.dt / self.min_time_step,2), 
-                    "Percent completed:", round(100*self.time/self.T,1)
-                )
+                "Step: ",
+                i_step,
+                "TS Ratio:",
+                round(self.dt / self.min_time_step, 2),
+                "Percent completed:",
+                round(100 * self.time / self.T, 1),
+            )
             self.times.append(self.time)
             self.save.append(self.state.vals.copy())
             self.advance()
@@ -180,12 +183,12 @@ class time_advancer:
             self.time += self.dt
 
             # if i_step % 100 == 0:
-                # plt.plot(self.state.R0, self.state.vals[:,0])
-                # plt.plot(self.state.R0, self.state.vals[:,1])
-                # plt.xscale('log')
-                # plt.draw()
-                # plt.pause(1e-5)
-                # plt.clf()
+            # plt.plot(self.state.R0, self.state.vals[:,0])
+            # plt.plot(self.state.R0, self.state.vals[:,1])
+            # plt.xscale('log')
+            # plt.draw()
+            # plt.pause(1e-5)
+            # plt.clf()
 
             if self.method == "RK23" or self.method == "RK12":
                 self.adapt_stepsize()
@@ -194,5 +197,6 @@ class time_advancer:
                 step = False
 
         self.save = np.array(self.save, dtype=np.float32)
+
 
 #         return self
