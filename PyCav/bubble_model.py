@@ -181,23 +181,3 @@ class bubble_model:
             )
 
         return ret
-
-
-if __name__ == "__main__":
-
-    config = {}
-    config["model"] = "RPE"
-    # config["R"] = 1.0
-    config["V"] = 0.0
-    config["gamma"] = 1.4
-    config["Ca"] = 1.0
-    # config["Re_inv"] = 0
-    # config["Web"] = 0
-
-    R0 = 0.3
-    mybub = bubble_model(config=config, R0=R0)
-    # rhs = mybub.rhs(p=1.1)
-
-    sol = mybub.solve(T=10.0, p=1.1)
-    plt.plot(sol.t, sol.y[0])
-    plt.show()

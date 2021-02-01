@@ -17,13 +17,13 @@ def inputs():
     # Advancer parameters
     config["advancer"]["method"] = "Euler"
     # config["advancer"]["method"] = "RK23"
-    config["advancer"]["dt"] = 1.0e-3
-    config["advancer"]["T"] = 1
+    config["advancer"]["dt"] = 5.0e-3
+    config["advancer"]["T"] = 30
     config["advancer"]["error_tol"] = 1.0e-3
     config["advancer"]["Nfilt"] = 1
 
     # Acoustic
-    config["wave"]["amplitude"] = 2
+    config["wave"]["amplitude"] = 1.001
     # config["wave"]["form"] = "sine"
     config["wave"]["form"] = "constant"
     # config["wave"]["period"] = 4.0
@@ -40,7 +40,7 @@ def inputs():
     # config["pop"]["binning"] = "GH"
     config["pop"]["muR0"] = 1.0
     config["pop"]["sigR0"] = 0.3
-    config["pop"]["moments"] = [ [0, 1], [1, 0], [1, 1] ]
+    config["pop"]["moments"] = [ [1, 0], [0, 1], [1, 1] ]
     # config["pop"]["moments"] = [ [3, 2], [2, 1], [3, 0], [ 3*(1-1.4), 0, 3*1.4 ] ]
 
 
@@ -66,6 +66,7 @@ def advance_classes(config, sols):
     myadv.initialize_wave(wave_config=config["wave"])
     myadv.run()
     sols.append(myadv)
+
     return sols
 
 
@@ -80,9 +81,9 @@ if __name__ == "__main__":
     config = inputs()
     sols = []
 
-    # config["pop"]["NR0"] = 501
-    # config["advancer"]["Nfilt"] = 0
-    # advance_classes(config, sols)
+    config["pop"]["NR0"] = 501
+    config["advancer"]["Nfilt"] = 0
+    advance_classes(config, sols)
 
     config["pop"]["NR0"] = 51
     config["advancer"]["Nfilt"] = 0
@@ -98,21 +99,26 @@ if __name__ == "__main__":
     # config["advancer"]["Nfilt"] = 400
     # advance_classes(config, sols)
 
-    # config["pop"]["NR0"] = 51
-    # config["advancer"]["Nfilt"] = 600
-    # advance_classes(config, sols)
+    config["pop"]["NR0"] = 51
+    config["advancer"]["Nfilt"] = 600
+    advance_classes(config, sols)
 
     sols = get_moments(sols)
+
+    fig, ax = plt.subplots(1, sols[0].state.Nmom)
     for sol in sols:
-        plt.plot(
-            sol.times,
-            sol.moms[:,0],
-            label="NR0 = " + str(sol.state.NR0) + " Nfilt = " + str(sol.Nfilt)
-        )
-        plt.xlabel("$t$")
-        plt.ylabel("$M$" + str(sol.state.moments[0]))
-        plt.legend(loc="upper right")
+        for i in range(sol.state.Nmom):
+            ax[i].plot(
+                sol.times,
+                sol.moms[:,i],
+                label="NR0 = " + str(sol.state.NR0) + " Nfilt = " + str(sol.Nfilt)
+            )
+            ax[i].set(xlabel="$t$", ylabel="$M$" + str(sol.state.moments[i]))
+            ax[i].legend(loc="upper right")
+
+    plt.tight_layout()
     plt.show()
+
         
     # advance_mc(config)
 

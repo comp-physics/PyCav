@@ -231,34 +231,3 @@ class bubble_state:
                     raise Exception
             
         return ret
-
-
-if __name__ == "__main__":
-
-    pop_config = {}
-    pop_config["NR0"] = 101
-    pop_config["shape"] = "lognormal"
-    pop_config["binning"] = "Simpson"
-    pop_config["muR0"] = 1.0
-    pop_config["sigR0"] = 0.1
-    pop_config["moments"] = [[0, 0], [1, 0], [0, 1]]
-
-    model_config = {}
-    model_config["model"] = "RPE"
-    model_config["V"] = 0.0
-    model_config["gamma"] = 1.4
-    model_config["Re_inv"] = 0.001
-
-    state = bubble_state(pop_config=pop_config, model_config=model_config)
-
-    val = state.vals
-    # print("state = ", val)
-    plt.plot(state.R0, state.w)
-    plt.show()
-
-    # p = 1.1
-    # dt = 0.001
-    # for i in range(5):
-    #     state.get_rhs(p)
-    #     val += dt * state.rhs
-    #     print("state = ", val)

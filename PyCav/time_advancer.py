@@ -170,8 +170,8 @@ class time_advancer:
         while step:
             print(
                     "Step: ", i_step, 
-                    "     TS Ratio:", round(self.dt / self.min_time_step,2), 
-                    "     Percent completed:", round(100*self.time/self.T,1)
+                    "TS Ratio:", round(self.dt / self.min_time_step,2), 
+                    "Percent completed:", round(100*self.time/self.T,1)
                 )
             self.times.append(self.time)
             self.save.append(self.state.vals.copy())
@@ -195,52 +195,4 @@ class time_advancer:
 
         self.save = np.array(self.save, dtype=np.float32)
 
-        return self
-        # return [ self.times, self.save, self.state.R0 ]
-
-        # Nt = len(self.times)
-        # self.moms = np.zeros([Nt,self.state.Nmom])
-        # if self.filter: 
-        #     for j in range(Nt):
-        #         jMin = max(j-self.Nfilt,0)
-        #         self.moms[j,:] = self.state.get_quad(
-        #                 vals=self.save[jMin:j+1],
-        #                 Nfilt=j+1-jMin)
-        # else:
-        #     for j, vals in enumerate(self.save):
-        #         self.moms[j,:] = self.state.get_quad(vals=vals)
-
-        # self.plot()
-
-    def plot(self):
-        # plot R evolution for all quad points
-        # for i in range(self.state.NR0):
-        #     plt.plot(self.times, self.save[:,i,0])
-        # plt.plot(self.times, self.save[:,0,0])
-        # plt.xlabel("$t$")
-        # plt.ylabel("$R(t)$")
-        # plt.show()
-
-        plt.plot(
-                self.times, 
-                self.moms[:,0], 
-                label="NR0 = " + str(self.state.NR0) + " Nfilt = " + str(self.Nfilt)
-                )
-        plt.xlabel("$t$")
-        plt.ylabel("$M$" + str(self.state.moments[0]))
-        plt.legend(loc="upper right")
-
-        # fig, ax = plt.subplots(1, self.state.Nmom)
-        # for i in range(self.state.Nmom):
-        #     ax[i].plot(self.times, self.moms[:, i])
-        #     ax[i].set(xlabel="$t$", ylabel="$M$" + str(self.state.moments[i]))
-        # plt.tight_layout()
-
-
-if __name__ == "__main__":
-    config = {}
-    config["method"] = "Euler"
-    config["dt"] = 1.0e-5
-    config["T"] = 30.0
-    config["p"] = 1.0
-    myadv = time_advancer(config=config)
+#         return self
