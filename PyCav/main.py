@@ -4,6 +4,7 @@ from mc import mc
 from moments import get_moments
 import warnings
 from sys import exit
+from plotting import plot_moments, plot_integrands
 
 warnings.simplefilter("error")
 
@@ -19,13 +20,14 @@ def inputs():
     # Advancer parameters
     config["advancer"]["method"] = "Euler"
     # config["advancer"]["method"] = "RK23"
-    config["advancer"]["dt"] = 5.0e-3
-    config["advancer"]["T"] = 30
+    config["advancer"]["dt"] = 1.0e-3
+    config["advancer"]["T"] = 10
     config["advancer"]["error_tol"] = 1.0e-3
     config["advancer"]["Nfilt"] = 1
 
     # Acoustic
-    config["wave"]["amplitude"] = 1.001
+    # config["wave"]["amplitude"] = 3
+    config["wave"]["amplitude"] = 1.00001
     # config["wave"]["form"] = "sine"
     config["wave"]["form"] = "constant"
     # config["wave"]["period"] = 4.0
@@ -77,31 +79,14 @@ def advance_mc(config):
     mymc.run()
 
 
-def get_plots(sols):
-
-    fig, ax = plt.subplots(1, sols[0].state.Nmom)
-    for sol in sols:
-        for i in range(sol.state.Nmom):
-            ax[i].plot(
-                sol.times,
-                sol.moms[:, i],
-                label="NR0 = " + str(sol.state.NR0) + " Nfilt = " + str(sol.Nfilt),
-            )
-            ax[i].set(xlabel="$t$", ylabel="$M$" + str(sol.state.moments[i]))
-            ax[i].legend(loc="upper right")
-
-    plt.tight_layout()
-    plt.show()
-
-
 if __name__ == "__main__":
 
     config = inputs()
     sols = []
 
-    config["pop"]["NR0"] = 501
-    config["advancer"]["Nfilt"] = 0
-    advance_classes(config, sols)
+    # config["pop"]["NR0"] = 501
+    # config["advancer"]["Nfilt"] = 0
+    # advance_classes(config, sols)
 
     config["pop"]["NR0"] = 51
     config["advancer"]["Nfilt"] = 0
@@ -109,21 +94,23 @@ if __name__ == "__main__":
 
     # print(sols[0].state.R0)
 
-    config["pop"]["NR0"] = 51
-    config["advancer"]["Nfilt"] = 200
-    advance_classes(config, sols)
+    # config["pop"]["NR0"] = 51
+    # config["advancer"]["Nfilt"] = 200
+    # advance_classes(config, sols)
 
     # config["pop"]["NR0"] = 51
     # config["advancer"]["Nfilt"] = 400
     # advance_classes(config, sols)
 
-    config["pop"]["NR0"] = 51
-    config["advancer"]["Nfilt"] = 600
-    advance_classes(config, sols)
+    # config["pop"]["NR0"] = 51
+    # config["advancer"]["Nfilt"] = 600
+    # advance_classes(config, sols)
 
     sols = get_moments(sols)
 
-    get_plots(sols)
+    plot_moments(sols)
+    plot_integrands(sols)
+    plt.show()
 
     # advance_mc(config)
 
