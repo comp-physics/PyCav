@@ -9,7 +9,9 @@ class bubble_model:
 
         self.config = config
         self.R0 = R0
+        self.set_defaults()
         self.parse_config()
+        self.check_inputs()
 
         if self.model == "RPE" or self.model == "KM" or self.model == "Linear":
             self.num_RV_dim = 2
@@ -17,58 +19,56 @@ class bubble_model:
         else:
             raise NotImplementedError
 
+    def set_defaults(self):
+
+        self.model = "RPE"
+        self.R = self.R0
+        self.V = 0.0
+        self.gamma = 1.4
+        self.Ca = 1.0
+        self.viscosity = False
+        self.Re_inv = 0
+        self.tension = False
+        self.Web = 0
+        self.c = 0.0
+
     def parse_config(self):
+
         if "model" in self.config:
             self.model = self.config["model"]
-        else:
-            self.model = "RPE"
 
         if "R" in self.config:
             self.R = self.config["R"]
-        else:
-            self.R = self.R0
 
         if "V" in self.config:
             self.V = self.config["V"]
-        else:
-            self.V = 0.0
 
         if "gamma" in self.config:
             self.gamma = self.config["gamma"]
-        else:
-            self.gamma = 1.4
 
         if "Ca" in self.config:
             self.Ca = self.config["Ca"]
-        else:
-            self.Ca = 1.0
 
         if "Re_inv" in self.config:
+            self.viscosity = True
             self.Re_inv = self.config["Re_inv"]
-            if self.Re_inv <= 0.0:
-                raise ValueError(self.Re_inv)
-            else:
-                self.viscosity = True
-        else:
-            self.viscosity = False
-            self.Re_inv = 0
 
         if "Web" in self.config:
+            self.tension = True
             self.Web = self.config["Web"]
-            if self.Web <= 0.0:
-                raise ValueError(self.Web)
-            else:
-                self.tension = True
-        else:
-            self.tension = False
-            self.Web = 0
 
         if "c" in self.config:
             self.c = self.config["c"]
         elif self.model == "KM":
             raise Exception("need c")
-        else:
-            self.c = 0.0
+
+    def check_inputs(self):
+
+        if self.Web <= 0.0 and self.tension:
+            raise ValueError(self.Web)
+
+        if self.Re_inv <= 0.0 and self.viscosity:
+            raise ValueError(self.Re_inv)
 
     def get_cpbw(self):
         self.cpbw = self.Ca * ((self.R0 / self.R) ** (3.0 * self.gamma)) - self.Ca + 1.0

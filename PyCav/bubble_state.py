@@ -10,6 +10,7 @@ class bubble_state:
 
         self.model_config = model_config
         self.pop_config = pop_config
+        self.set_defaults()
         self.parse_config()
 
         # Initiate bubbles, weights, abscissas
@@ -51,38 +52,34 @@ class bubble_state:
 
         self.rhs = np.zeros((self.NR0, self.num_RV_dim))
 
+    def set_defaults(self):
+        self.NR0 = 1
+        self.shape = "lognormal"
+        self.binning = "Simpson"
+        self.sigR0 = 0.3
+        self.muR0 = 1.0
+        self.moments = [[0, 0]]
+        self.Nmom = 1
+
     def parse_config(self):
         if "NR0" in self.pop_config:
             self.NR0 = self.pop_config["NR0"]
-        else:
-            self.NR0 = 1
 
         if "shape" in self.pop_config:
             self.shape = self.pop_config["shape"]
-        else:
-            self.shape = "lognormal"
 
         if "binning" in self.pop_config:
             self.binning = self.pop_config["binning"]
-        else:
-            self.binning = "Simpson"
 
         if "sigR0" in self.pop_config:
             self.sigR0 = self.pop_config["sigR0"]
-        else:
-            self.sigR0 = 0.3
 
         if "muR0" in self.pop_config:
             self.muR0 = self.pop_config["muR0"]
-        else:
-            self.muR0 = 1.0
 
         if "moments" in self.pop_config:
             self.moments = self.pop_config["moments"]
             self.Nmom = len(self.moments)
-        else:
-            self.moments = [[0, 0]]
-            self.Nmom = 1
 
     def init_pdf(self):
         if self.shape == "lognormal":

@@ -14,6 +14,9 @@ class time_advancer:
         self.max_time_step = 1.0e5
         self.min_time_step = self.dt
 
+        self.set_stepper()
+
+    def set_stepper(self):
         if self.method == "Euler":
             self.advance = self.euler
             self.n_stages = 0
@@ -197,6 +200,3 @@ class time_advancer:
                 step = False
 
         self.save = np.array(self.save, dtype=np.float32)
-
-
-#         return self

@@ -77,6 +77,23 @@ def advance_mc(config):
     mymc.run()
 
 
+def get_plots(sols):
+
+    fig, ax = plt.subplots(1, sols[0].state.Nmom)
+    for sol in sols:
+        for i in range(sol.state.Nmom):
+            ax[i].plot(
+                sol.times,
+                sol.moms[:, i],
+                label="NR0 = " + str(sol.state.NR0) + " Nfilt = " + str(sol.Nfilt),
+            )
+            ax[i].set(xlabel="$t$", ylabel="$M$" + str(sol.state.moments[i]))
+            ax[i].legend(loc="upper right")
+
+    plt.tight_layout()
+    plt.show()
+
+
 if __name__ == "__main__":
 
     config = inputs()
@@ -106,19 +123,7 @@ if __name__ == "__main__":
 
     sols = get_moments(sols)
 
-    fig, ax = plt.subplots(1, sols[0].state.Nmom)
-    for sol in sols:
-        for i in range(sol.state.Nmom):
-            ax[i].plot(
-                sol.times,
-                sol.moms[:, i],
-                label="NR0 = " + str(sol.state.NR0) + " Nfilt = " + str(sol.Nfilt),
-            )
-            ax[i].set(xlabel="$t$", ylabel="$M$" + str(sol.state.moments[i]))
-            ax[i].legend(loc="upper right")
-
-    plt.tight_layout()
-    plt.show()
+    get_plots(sols)
 
     # advance_mc(config)
 
