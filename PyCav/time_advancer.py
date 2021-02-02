@@ -168,8 +168,6 @@ class time_advancer:
         self.times = []
         # np.set_printoptions(precision=24)
 
-        # plt.ion()
-
         while step:
             print(
                 "Step: ",
@@ -184,14 +182,6 @@ class time_advancer:
             self.advance()
             i_step += 1
             self.time += self.dt
-
-            # if i_step % 100 == 0:
-            # plt.plot(self.state.R0, self.state.vals[:,0])
-            # plt.plot(self.state.R0, self.state.vals[:,1])
-            # plt.xscale('log')
-            # plt.draw()
-            # plt.pause(1e-5)
-            # plt.clf()
 
             if self.method == "RK23" or self.method == "RK12":
                 self.adapt_stepsize()
