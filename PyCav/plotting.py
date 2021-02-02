@@ -17,6 +17,7 @@ def plot_moments(sols):
             ax[i].legend(loc="upper right")
 
     plt.tight_layout()
+    plt.show()
 
 
 def plot_integrands(sols):
@@ -49,5 +50,6 @@ def plot_integrands(sols):
             y_dat /= sols[0].state.R0
             my_plot.set_ydata(y_dat)
         fig.canvas.draw_idle()
-
+ 
     a_slider.on_changed(update)
+    plt.show()

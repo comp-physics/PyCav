@@ -30,18 +30,10 @@ class bubble_state:
         else:
             raise ValueError(self.NR0)
 
-        # print("R0", self.R0)
-        # print("w", self.w)
-        # print("sum", np.sum(self.w))
-
         self.get_bubbles()
 
         # Assume all bubbles have the same model
         self.num_RV_dim = self.bubble[0].num_RV_dim
-
-        # for mom in self.moments:
-        #     if len(mom) != self.num_RV_dim:
-        #         raise ValueError(mom, self.num_RV_dim)
 
         self.vals = np.zeros((self.NR0, self.num_RV_dim))
         for i in range(self.NR0):

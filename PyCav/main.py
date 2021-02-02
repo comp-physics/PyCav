@@ -110,7 +110,6 @@ if __name__ == "__main__":
 
     plot_moments(sols)
     plot_integrands(sols)
-    plt.show()
 
     # advance_mc(config)
 
