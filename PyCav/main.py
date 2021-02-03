@@ -26,8 +26,8 @@ def inputs():
     config["advancer"]["Nfilt"] = 1
 
     # Acoustic
-    # config["wave"]["amplitude"] = 3
-    config["wave"]["amplitude"] = 1.00001
+    config["wave"]["amplitude"] = 3
+    # config["wave"]["amplitude"] = 1.00001
     # config["wave"]["form"] = "sine"
     config["wave"]["form"] = "constant"
     # config["wave"]["period"] = 4.0
@@ -89,6 +89,11 @@ if __name__ == "__main__":
     # advance_classes(config, sols)
 
     config["pop"]["NR0"] = 51
+    config["advancer"]["Nfilt"] = 0
+    advance_classes(config, sols)
+
+
+    config["pop"]["NR0"] = 501
     config["advancer"]["Nfilt"] = 0
     advance_classes(config, sols)
 

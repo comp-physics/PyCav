@@ -22,9 +22,9 @@ def plot_moments(sols):
 
 def plot_integrands(sols):
 
-    a_min = 0
-    a_max = len(sols[0].times) - 1
-    a_init = int(a_max / 2.0)
+    t_min = 0
+    t_max = len(sols[0].times) - 1
+    t_init = int(t_max / 2.0)
 
     fig = plt.figure(figsize=(8, 3))
     plt_ax = plt.axes([0.1, 0.2, 0.8, 0.65])
@@ -32,24 +32,44 @@ def plot_integrands(sols):
 
     plt.axes(plt_ax)
 
-    lin = False
-    if abs(sols[0].wave.amplitude - 1) < 1e-2:
-        lin = True
+    lin = is_lin(sols[0].wave.amplitude)
+    for sol in sols:
+        x_dat = sol.state.R0
+        y_dat = get_y(t_init,sol,lin)
+        (my_plot,) = plt.plot(x_dat, y_dat)
+    plt.xscale("log")
 
-    y_dat = sols[0].save[a_init, :, 0]
-    if lin:
-        y_dat /= sols[0].state.R0
+    a_slider = Slider(slider_ax, "$t$", t_min, t_max, valinit=t_init)
 
-    (my_plot,) = plt.plot(sols[0].state.R0, y_dat)
-
-    a_slider = Slider(slider_ax, "$t$", a_min, a_max, valinit=a_init)
-
-    def update(a):
-        y_dat = sols[0].save[int(a), :, 0]
-        if lin:
-            y_dat /= sols[0].state.R0
-            my_plot.set_ydata(y_dat)
+    def update(t):
+        plt.cla()
+        for sol in sols:
+            x_dat = sol.state.R0
+            y_dat = get_y(t,sol,lin)
+            (my_plot,) = plt.plot(x_dat, y_dat)
+        plt.xscale("log")
         fig.canvas.draw_idle()
  
     a_slider.on_changed(update)
     plt.show()
+
+def is_lin(p):
+    if abs(p - 1) < 1e-2:
+        lin = True
+    else:
+        lin = False
+    return lin
+
+def get_y(t=0,sol=None,lin=True):
+    p = sol.wave.amplitude
+    eps = -1*(p-1.)
+    pdf = sol.state.f.copy()
+    # pdf = 1.
+
+    y_dat = sol.save[int(t), :, 0]
+    if lin:
+        y_dat /= sol.state.R0
+        y_dat -= 1.
+        y_dat /= eps
+    y_dat *= pdf
+    return y_dat
