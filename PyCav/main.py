@@ -4,7 +4,7 @@ from mc import mc
 from moments import get_moments
 import warnings
 from sys import exit
-from plotting import plot_moments, plot_integrands
+from plotting import plot_moments, plot_integrands, plot_integrands_sub
 
 warnings.simplefilter("error")
 
@@ -84,37 +84,33 @@ if __name__ == "__main__":
     config = inputs()
     sols = []
 
-    # config["pop"]["NR0"] = 501
-    # config["advancer"]["Nfilt"] = 0
-    # advance_classes(config, sols)
+
 
     config["pop"]["NR0"] = 51
-    config["advancer"]["Nfilt"] = 0
-    advance_classes(config, sols)
-
-
-    config["pop"]["NR0"] = 501
     config["advancer"]["Nfilt"] = 0
     advance_classes(config, sols)
 
     # print(sols[0].state.R0)
 
     # config["pop"]["NR0"] = 51
-    # config["advancer"]["Nfilt"] = 200
+    # config["advancer"]["Nfilt"] = 300
     # advance_classes(config, sols)
 
-    # config["pop"]["NR0"] = 51
-    # config["advancer"]["Nfilt"] = 400
-    # advance_classes(config, sols)
 
     # config["pop"]["NR0"] = 51
     # config["advancer"]["Nfilt"] = 600
     # advance_classes(config, sols)
 
+
+    config["pop"]["NR0"] = 501
+    config["advancer"]["Nfilt"] = 0
+    advance_classes(config, sols)
+
     sols = get_moments(sols)
 
-    plot_moments(sols)
-    plot_integrands(sols)
+    # plot_moments(sols)
+    # plot_integrands(sols)
+    plot_integrands_sub(sols)
 
     # advance_mc(config)
 
