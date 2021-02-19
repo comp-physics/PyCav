@@ -3,7 +3,7 @@ import numpy as np
 import scipy.stats as sp
 import matplotlib.pyplot as plt
 from sys import exit
-
+from moments import get_G
 
 class bubble_state:
     def __init__(self, pop_config={}, model_config={}):
@@ -31,6 +31,7 @@ class bubble_state:
             raise ValueError(self.NR0)
 
         self.get_bubbles()
+        self.periods = 2.*np.pi/np.sqrt(3*1.4/(self.R0**2.))
 
         # Assume all bubbles have the same model
         self.num_RV_dim = self.bubble[0].num_RV_dim
@@ -73,13 +74,32 @@ class bubble_state:
             self.moments = self.pop_config["moments"]
             self.Nmom = len(self.moments)
 
+        if "Nfilt" in self.pop_config and "Tfilt" in self.pop_config:
+            raise Exception('choose one of Nfilt and Tfilt')
+        elif "Nfilt" in self.pop_config:
+            self.filter = True
+            self.Nfilt = self.pop_config["Nfilt"]
+            self.Tfilt = 0 
+        elif "Tfilt" in self.pop_config:
+            self.filter = True
+            self.Tfilt = self.pop_config["Tfilt"]
+            self.Nfilt = 0 
+        else:
+            self.filter = False
+            self.Nfilt = 0 
+            self.Tfilt = 0 
+
     def init_pdf(self):
         if self.shape == "lognormal":
+            print('lognormal')
             self.f = sp.lognorm.pdf(self.R0, self.sigR0, loc=np.log(self.muR0))
         elif self.shape == "normal":
-            self.f = sp.norm.pdf(self.R0, self.sigR0, loc=self.muR0)
+            print('normal')
+            self.f = sp.norm.pdf(self.R0, scale=self.sigR0, loc=self.muR0)
         else:
             raise NotImplementedError
+        if (max(abs(self.f)) < 1.e-6):
+            raise Exception('all PDF points are small')
 
     def init_GH(self):
         """
@@ -142,21 +162,23 @@ class bubble_state:
 
     def init_GL(self):
         # from here: https://numpy.org/doc/stable/reference/generated/numpy.polynomial.legendre.leggauss.html
-        a = 0.8 * np.exp(-2.8 * self.sigR0)
-        b = 0.2 * np.exp(9.5 * self.sigR0) + 1.0
+        self.get_bounds()
+
         self.R0, self.w = np.polynomial.legendre.leggauss(self.NR0)
         self.R0 += 1.0
-        self.R0 *= 0.5 * (b - a)
-        self.R0 += a
+        self.R0 *= 0.5 * (self.b - self.a)
+        self.R0 += self.a
 
         self.init_pdf()
         self.w *= self.f
         self.w /= np.sum(self.w)
 
     def init_simp(self):
-        a = 0.8 * np.exp(-2.8 * self.sigR0)
-        b = 0.2 * np.exp(9.5 * self.sigR0) + 1.0
-        self.R0 = np.logspace(np.log10(a), np.log10(b), num=self.NR0)
+        self.get_bounds()
+        self.R0 = np.logspace(
+                np.log10(self.a), 
+                np.log10(self.b), 
+                num=self.NR0)
 
         self.dR0 = np.zeros(self.NR0)
         for i in range(self.NR0 - 1):
@@ -180,7 +202,13 @@ class bubble_state:
 
     def init_mono(self):
         self.w = np.ones(1)
-        self.R0 = np.ones(1)
+        self.R0 = np.ones(1)*self.muR0
+
+    def get_bounds(self):
+        self.a = 0.8 * np.exp(-2.8 * self.sigR0) + (self.muR0 - 1.)
+        self.b = 0.2 * np.exp(9.5 * self.sigR0) + 1.0 + (self.muR0 - 1.)
+        if (self.a <= 0.):
+            raise ValueError(self.a)
 
     def get_bubbles(self):
         self.bubble = [bm.bubble_model(config=self.model_config, R0=x) for x in self.R0]
@@ -191,9 +219,46 @@ class bubble_state:
             self.rhs[i, :] = self.bubble[i].rhs(p)
         return self.rhs
 
-    def get_quad(self, vals=None, Nfilt=0):
+    def get_quad(self, vals=None, filt=False, Nfilt=0, Tfilt=False, shifts=0):
         ret = np.zeros(self.Nmom)
-        if Nfilt == 0:
+        if filt:
+            if Nfilt > 0:
+                for k, mom in enumerate(self.moments):
+                    if self.num_RV_dim == 2 and len(mom) == 2:
+                        G = np.zeros(self.NR0)
+                        for q in range(Nfilt):
+                            G += vals[q, :, 0] ** mom[0] * vals[q, :, 1] ** mom[1]
+                        G /= float(Nfilt)
+                        ret[k] = np.sum(self.w[:] * G[:])
+                    else:
+                        raise Exception('I cant handle a requested moment...')
+            elif Tfilt:
+                for k, mom in enumerate(self.moments):
+                    if self.num_RV_dim == 2 and len(mom) == 2:
+                        # vals[ time, R0_node, int_coordinate ]
+                        # Get max number of times (going backward)
+                        Nt = len(vals[:,0,0])
+                        # G = np.zeros(self.NR0)
+                        G = get_G(vals=vals,
+                                mom=mom,
+                                Nt=Nt,
+                                shifts=shifts,
+                                NR0=self.NR0)
+                        # for i in range(self.NR0):
+                        #     G[i] = 0.
+                        #     for q in range(Nt-1,Nt-1+shifts[i],-1):
+                        #         G[i] += (
+                        #                 vals[q, i, 0] ** mom[0] * 
+                        #                 vals[q, i, 1] ** mom[1]
+                        #             )
+                        #     G[i] /= (abs(shifts[i]) + 1.)
+
+                        ret[k] = np.sum(self.w[:] * G[:])
+                    else:
+                        raise Exception('I cant handle a requested moment...')
+            else:
+                raise Exception('Need one of Nfilt or Tfilt')
+        else:
             for k, mom in enumerate(self.moments):
                 if self.num_RV_dim == 2 and len(mom) == 2:
                     ret[k] = np.sum(
@@ -206,16 +271,6 @@ class bubble_state:
                         * vals[:, 1] ** mom[1]
                         * self.R0[:] ** mom[2]
                     )
-                else:
-                    raise Exception
-        else:
-            for k, mom in enumerate(self.moments):
-                if self.num_RV_dim == 2 and len(mom) == 2:
-                    G = np.zeros(self.NR0)
-                    for q in range(Nfilt):
-                        G += vals[q, :, 0] ** mom[0] * vals[q, :, 1] ** mom[1]
-                    G /= float(Nfilt)
-                    ret[k] = np.sum(self.w[:] * G[:])
                 else:
                     raise Exception
 

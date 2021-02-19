@@ -11,7 +11,7 @@ def plot_moments(sols):
             ax[i].plot(
                 sol.times,
                 sol.moms[:, i],
-                label="NR0 = " + str(sol.state.NR0) + " Nfilt = " + str(sol.Nfilt),
+                label="NR0 = " + str(sol.state.NR0) + " Nfilt = " + str(sol.state.Nfilt),
             )
             ax[i].set(xlabel="$t$", ylabel="$M$" + str(sol.state.moments[i]))
             ax[i].legend(loc="lower center",bbox_to_anchor=(0.5,1.03))

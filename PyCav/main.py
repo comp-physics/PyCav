@@ -5,11 +5,16 @@ from moments import get_moments
 import warnings
 from sys import exit
 from plotting import plot_moments, plot_integrands, plot_integrands_sub
+import numpy as np
 
 warnings.simplefilter("error")
 
 
 def inputs():
+    Ro = 1
+    omega = np.sqrt(3*1.4/(Ro**2.))
+    T = 2.*np.pi/omega
+
     config = {}
     config["advancer"] = {}
     config["wave"] = {}
@@ -18,16 +23,15 @@ def inputs():
     config["mc"] = {}
 
     # Advancer parameters
-    config["advancer"]["method"] = "Euler"
+    config["advancer"]["method"] = "RK3"
     # config["advancer"]["method"] = "RK23"
-    config["advancer"]["dt"] = 1.0e-3
-    config["advancer"]["T"] = 10
+    config["advancer"]["dt"] = 1.0e-4
+    config["advancer"]["T"] = T
     config["advancer"]["error_tol"] = 1.0e-3
-    config["advancer"]["Nfilt"] = 1
 
     # Acoustic
-    config["wave"]["amplitude"] = 3
-    # config["wave"]["amplitude"] = 1.00001
+    # config["wave"]["amplitude"] = 3
+    config["wave"]["amplitude"] = 1.00001
     # config["wave"]["form"] = "sine"
     config["wave"]["form"] = "constant"
     # config["wave"]["period"] = 4.0
@@ -42,10 +46,13 @@ def inputs():
     config["pop"]["shape"] = "lognormal"
     config["pop"]["binning"] = "Simpson"
     # config["pop"]["binning"] = "GH"
-    config["pop"]["muR0"] = 1.0
-    config["pop"]["sigR0"] = 0.3
+    config["pop"]["muR0"] = 1.
+    config["pop"]["sigR0"] = 0.1
     config["pop"]["moments"] = [[1, 0], [0, 1], [1, 1]]
     # config["pop"]["moments"] = [ [3, 2], [2, 1], [3, 0], [ 3*(1-1.4), 0, 3*1.4 ] ]
+    # config["pop"]["Nfilt"] = 100
+    config["pop"]["Tfilt"] = 1
+
 
     # Bubble properties
     config["model"]["model"] = "RPE"
@@ -84,33 +91,31 @@ if __name__ == "__main__":
     config = inputs()
     sols = []
 
-
-
-    config["pop"]["NR0"] = 51
-    config["advancer"]["Nfilt"] = 0
+    config["pop"]["NR0"] = 15
+    config["pop"]["Nfilt"] = 0
     advance_classes(config, sols)
 
     # print(sols[0].state.R0)
 
     # config["pop"]["NR0"] = 51
-    # config["advancer"]["Nfilt"] = 300
+    # config["pop"]["Nfilt"] = 300
     # advance_classes(config, sols)
 
 
     # config["pop"]["NR0"] = 51
-    # config["advancer"]["Nfilt"] = 600
+    # config["pop"]["Nfilt"] = 600
     # advance_classes(config, sols)
 
 
-    config["pop"]["NR0"] = 501
-    config["advancer"]["Nfilt"] = 0
-    advance_classes(config, sols)
+    # config["pop"]["NR0"] = 501
+    # config["pop"]["Nfilt"] = 0
+    # advance_classes(config, sols)
 
     sols = get_moments(sols)
 
-    # plot_moments(sols)
+    plot_moments(sols)
     # plot_integrands(sols)
-    plot_integrands_sub(sols)
+    # plot_integrands_sub(sols)
 
     # advance_mc(config)
 

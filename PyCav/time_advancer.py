@@ -64,12 +64,6 @@ class time_advancer:
         else:
             self.error_tol = 0.0
 
-        if "Nfilt" in self.config:
-            self.filter = True
-            self.Nfilt = self.config["Nfilt"]
-        else:
-            self.filter = False
-            self.Nfilt = 0
 
     def initialize_state(self, pop_config=None, model_config=None):
         self.state = bs.bubble_state(pop_config=pop_config, model_config=model_config)
