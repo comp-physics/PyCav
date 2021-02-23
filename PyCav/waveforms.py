@@ -50,7 +50,7 @@ class waveforms:
     def p_sine(self, t):
         if t <= self.period * self.cycles:
             f = 2.0 * np.pi / self.period
-            return [self.amplitude * np.sin(f * t), self.amplitude * np.cos(f * t) * f]
+            return [self.ambient + self.amplitude * np.sin(f * t), self.amplitude * np.cos(f * t) * f]
         else:
             return [self.ambient, 0.0]
 

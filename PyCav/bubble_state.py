@@ -91,14 +91,12 @@ class bubble_state:
 
     def init_pdf(self):
         if self.shape == "lognormal":
-            print('lognormal')
             self.f = sp.lognorm.pdf(self.R0, self.sigR0, loc=np.log(self.muR0))
         elif self.shape == "normal":
-            print('normal')
             self.f = sp.norm.pdf(self.R0, scale=self.sigR0, loc=self.muR0)
         else:
             raise NotImplementedError
-        if (max(abs(self.f)) < 1.e-6):
+        if max(abs(self.f)) < 1.e-6:
             raise Exception('all PDF points are small')
 
     def init_GH(self):
@@ -240,7 +238,7 @@ class bubble_state:
                         Nt = len(vals[:,0,0])
                         # G = np.zeros(self.NR0)
                         G = get_G(vals=vals,
-                                mom=mom,
+                                mom=np.array(mom),
                                 Nt=Nt,
                                 shifts=shifts,
                                 NR0=self.NR0)

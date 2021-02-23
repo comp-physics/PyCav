@@ -31,7 +31,9 @@ def get_moment(sol):
                 # Get target time steps
                 jTargets = []
                 current_time = sol.times[j]
-                t_target = current_time - sol.state.periods
+                t_target = \
+                        current_time - \
+                        sol.state.Tfilt * sol.state.periods
                 # print('t_targets: ', t_target)
                 for k in range(sol.state.NR0):
                     q = np.argmin(np.abs(sol.times - t_target[k]))
@@ -52,8 +54,9 @@ def get_moment(sol):
                 jShift = np.array(jTargets) - j
                 # print('jShift: ', jShift)
 
+                # print('js',jMin,j)
                 mom[j, :] = sol.state.get_quad(
-                    vals=sol.save[jMin : j], 
+                    vals=sol.save[jMin : j+1], 
                     filt=True,
                     Tfilt=True,
                     shifts=jShift
@@ -71,13 +74,18 @@ def get_G(vals,
         shifts,
         NR0):
     G = np.zeros(NR0)
+    # print(vals)
+    # print(np.shape(vals))
     for i in range(NR0):
         G[i] = 0.
-        for q in range(Nt-1,Nt-1+shifts[i],-1):
+        # print('shifts', shifts)
+        # print('Nt ->',Nt-1,Nt-1+shifts-1)
+        for q in range(Nt-1,Nt-1+shifts[i]-1,-1):
             G[i] += (
                     vals[q, i, 0] ** mom[0] * 
                     vals[q, i, 1] ** mom[1]
                 )
         G[i] /= (abs(shifts[i]) + 1.)
 
+    # print('G = ',G)
     return G
