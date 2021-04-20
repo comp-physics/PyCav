@@ -3,6 +3,8 @@ import waveforms as wf
 import numpy as np
 from sys import exit
 import matplotlib.pyplot as plt
+import csv
+import h5py
 
 
 class time_advancer:
@@ -15,6 +17,7 @@ class time_advancer:
         self.min_time_step = self.dt
 
         self.set_stepper()
+        self.file_name += ".h5"
 
     def set_stepper(self):
         if self.method == "Euler":
@@ -63,6 +66,16 @@ class time_advancer:
             raise Exception("Need error tolerance")
         else:
             self.error_tol = 0.0
+
+        if "io" in self.config:
+            self.io = self.config["io"]
+        else:
+            self.io = 1
+
+        if "file_name" in self.config:
+            self.file_name = self.config["file_name"]
+        else:
+            self.file_name = "default_file_name"
 
 
     def initialize_state(self, pop_config=None, model_config=None):
@@ -163,14 +176,17 @@ class time_advancer:
         # np.set_printoptions(precision=24)
 
         while step:
-            print(
-                "Step: ",
-                i_step,
-                "TS Ratio:",
-                round(self.dt / self.min_time_step, 2),
-                "Percent completed:",
-                round(100 * self.time / self.T, 1),
-            )
+            if i_step % self.io == 0:
+                print(
+                    "Step: ",
+                    i_step,
+                    "TS Ratio:",
+                    round(self.dt / self.min_time_step, 2),
+                    "Percent completed:",
+                    round(100 * self.time / self.T, 1),
+                )
+                self.write_to_h5(i_step)
+
             self.times.append(self.time)
             self.save.append(self.state.vals.copy())
             self.advance()
@@ -183,4 +199,28 @@ class time_advancer:
             if self.time >= self.T:
                 step = False
 
+
         self.save = np.array(self.save, dtype=np.float32)
+
+    def write_to_h5(self, i_step):
+        """
+        This function writes the current state to a h5 file. 
+        """
+        if i_step == 0:
+            write_flag = "w"
+        else:
+            write_flag = "a"
+
+        with h5py.File(self.file_name, write_flag) as f:
+            if i_step == 0:
+                g = f.create_group("pressure_input")
+                g["wave_form"] = self.wave.form
+                g["wave_amplitude"] = self.wave.amplitude
+                g["wave_period"] = self.wave.period
+
+            g = f.create_group("step_"+str(i_step))
+            g["time"] = self.time
+            g["step_size"] = self.dt
+            g["R0s"] = self.state.R0
+            g["state"] = self.state.vals
+            g["p"] = self.wave.p(self.time)

@@ -1,6 +1,6 @@
 import numpy as np
 from numba import njit
-
+import h5py
 
 def get_moments(sols):
     moms = []
@@ -37,6 +37,7 @@ def get_moment(sol):
                 # print('t_targets: ', t_target)
                 for k in range(sol.state.NR0):
                     q = np.argmin(np.abs(sol.times - t_target[k]))
+                    if q == 0: q = j #don't average if we cant get whole period
                     jTargets.append(q)
                     # print('jtarg: ',jTargets[i])
                     # Set to zero if they're negative (don't exist)
@@ -67,7 +68,7 @@ def get_moment(sol):
 
     return mom
 
-@njit()
+@njit
 def get_G(vals,
         mom,
         Nt,
@@ -89,3 +90,14 @@ def get_G(vals,
 
     # print('G = ',G)
     return G
+
+def write_moments(sol,filename=None):
+    """
+    This function writes the current state to a h5 file. 
+    """
+    write_flag = "a"
+    for i_step, time in enumerate(sol.times):
+        if i_step % sol.io == 0:
+            with h5py.File(sol.file_name, "a") as f:
+                f["step_"+str(i_step)]["moment_indices"] = sol.state.moments
+                f["step_"+str(i_step)]["moments"] = sol.moms[i_step,:]
