@@ -1,4 +1,5 @@
 # PyCav
+[![DOI](https://zenodo.org/badge/328061167.svg)](https://zenodo.org/badge/latestdoi/328061167)
 
 ## Objective
 
